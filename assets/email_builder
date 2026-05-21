@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Builder — Template Builder & AI Agent</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* Modern High-Contrast Theming System */
+        :root {
+            --brand-yellow: #fce300;
+            --bg-app: #f4f5f8; 
+            --bg-panel: #ffffff; 
+            --bg-hover: #f9fafb;
+            --bg-active: #f3f4f6;
+            --bg-badge: #f3f4f6;
+            
+            --text-main: #111827; 
+            --text-secondary: #4b5563;
+            --text-muted: #9ca3af;
+            
+            --text-info: #2563eb; --bg-info: #eff6ff;
+            --text-success: #16a34a; --bg-success: #f0fdf4;
+            --text-warning: #d97706; --bg-warning: #fffbeb;
+            --text-danger: #dc2626; --bg-danger: #fef2f2;
+            
+            --border-color: #e5e7eb; 
+            --border-focus: #d1d5db; 
+            
+            --btn-primary-bg: #111827;
+            --btn-primary-text: #ffffff;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px; 
+            --radius-lg: 12px;
+            --font: "Inter", system-ui, -apple-system, sans-serif;
+        }
+
+        :root[data-theme="dark"] {
+            --brand-yellow: #dca300;
+            --bg-app: #0f1115; 
+            --bg-panel: #18181b; 
+            --bg-hover: #27272a;
+            --bg-active: #27272a;
+            --bg-badge: #3f3f46;
+            
+            --text-main: #f9fafb; 
+            --text-secondary: #d1d5db;
+            --text-muted: #6b7280;
+            
+            --text-info: #60a5fa; --bg-info: #1e3a8a;
+            --border-color: #27272a; 
+            --border-focus: #4b5563; 
+            
+            --btn-primary-bg: #ffffff;
+            --btn-primary-text: #000000;
+        }
+        
+        body { font-family: var(--font); color: var(--text-main); background: var(--bg-app); line-height: 1.5; height: 100vh; overflow: hidden; margin: 0; }
+        
+        /* App Layout Container */
+        .app-container { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+
+        /* Left App Sidebar */
+        .app-sidebar { width: 260px; min-width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; transition: background 0.3s, border-color 0.3s; }
+        .sidebar-header { background: var(--brand-yellow); padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 10px; height: 65px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .sidebar-header svg { width: 24px; height: 24px; color: #000; }
+        .sidebar-header h1 { font-size: 18px; font-weight: 800; margin: 0; color: #000; letter-spacing: -0.02em; }
+        
+        .sidebar-actions { padding: 1.25rem; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--border-color); }
+        
+        /* Top Navigation Tabs */
+        .top-nav { display: flex; gap: 8px; align-items: center; margin-right: auto; margin-left: 2rem; }
+        .top-nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: var(--radius-md); cursor: pointer; color: var(--text-secondary); font-size: 13px; font-weight: 500; transition: all 0.2s; }
+        .top-nav-item:hover { background: var(--bg-hover); color: var(--text-main); }
+        .top-nav-item.active { background: var(--bg-active); color: var(--text-main); font-weight: 700; }
+        .top-nav-badge { background: var(--bg-badge); color: var(--text-main); font-size: 11px; padding: 2px 8px; border-radius: 12px; font-weight: 700; }
+        .top-nav-item.active .top-nav-badge { background: var(--btn-primary-bg); color: var(--btn-primary-text); }
+
+        /* Main App Area */
+        .app-main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg-app); }
+        .top-bar { height: 65px; min-height: 65px; background: var(--bg-panel); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; }
+        .search-mock { display: flex; align-items: center; background: var(--bg-app); padding: 8px 16px; border-radius: var(--radius-md); width: 400px; color: var(--text-muted); font-size: 13px; border: 1px solid var(--border-color); }
+        
+        .app-content { flex: 1; overflow-y: auto; padding: 2rem; }
+        
+        /* Typography & Layouts inside Content */
+        .section-title-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; }
+        .yellow-dot { display: inline-block; width: 10px; height: 10px; background: var(--brand-yellow); border-radius: 50%; box-shadow: 0 0 0 3px rgba(252, 227, 0, 0.2); }
+        .section-title { margin: 0; font-size: 16px; text-transform: uppercase; font-weight: 800; color: var(--text-main); letter-spacing: 0.05em; }
+
+        .card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; transition: background-color 0.3s, border-color 0.3s; }
+
+        /* Buttons */
+        .run-btn { background: var(--btn-primary-bg); color: var(--btn-primary-text); border: none; border-radius: var(--radius-md); padding: 10px 14px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .run-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+        .run-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .run-btn.secondary { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-focus); box-shadow: none; }
+        .run-btn.secondary:hover { background: var(--bg-hover); border-color: var(--text-muted); }
+
+        /* Unified Form Controls & Dropdowns */
+        .field-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+        .field-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; }
+        .field-group input, .field-group textarea, select { padding: 10px 12px; font-size: 13px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-panel); color: var(--text-main); outline: none; transition: border-color 0.2s; width: 100%; font-family: var(--font); }
+        .field-group input:focus, .field-group textarea:focus, select:focus { border-color: var(--text-main); box-shadow: 0 0 0 1px var(--text-main); }
+        
+        select { 
+            appearance: none; -webkit-appearance: none; 
+            background-image: url('data:image/svg+xml;utf8,<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%236b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>'); 
+            background-repeat: no-repeat; background-position: right 12px center; 
+            padding-right: 32px; cursor: pointer; 
+        }
+
+        /* View Tabs (Underline Style) */
+        .content-tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+        .content-tab { background: transparent; border: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); padding: 10px 0; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; margin-bottom: -1px; }
+        .content-tab:hover { color: var(--text-main); }
+        .content-tab.active { color: var(--text-main); border-bottom-color: var(--text-main); }
+
+        /* Workspace Split Screen */
+        .workspace-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; }
+        @media (max-width: 1100px) { .workspace-split { grid-template-columns: 1fr; } }
+        
+        .split-header { font-size: 13px; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        #view-preview { position: sticky; top: 0; }
+
+        /* Toolbar in Editor */
+        .editor-toolbar { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .editor-toolbar-item { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 8px; background: var(--bg-hover); padding: 12px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+
+        .section { display: none; animation: fadeIn 0.2s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Settings Sub-Sidebar */
+        .settings-layout { display: grid; grid-template-columns: 220px 1fr; gap: 2.5rem; align-items: start; }
+        @media (max-width: 768px) { .settings-layout { grid-template-columns: 1fr; } }
+        .settings-sidebar { display: flex; flex-direction: column; gap: 4px; border-right: 1px solid var(--border-color); padding-right: 1.5rem; min-height: 400px; }
+        .settings-nav-btn { padding: 10px 12px; font-size: 13px; font-weight: 500; border: none; border-radius: var(--radius-md); cursor: pointer; background: transparent; color: var(--text-secondary); text-align: left; transition: all 0.2s; width: 100%; }
+        .settings-nav-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        .settings-nav-btn.active { background: var(--bg-active); color: var(--text-main); font-weight: 700; }
+        
+        .settings-group { display: none; }
+        .settings-group.active { display: block; animation: fadeIn 0.2s ease; }
+        .settings-group h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--text-main); }
+
+        /* Unified List-based Editor / Blocks */
+        .order-item { padding: 16px; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius-md); cursor: grab; display: flex; flex-direction: column; align-items: stretch; gap: 12px; transition: all 0.2s; user-select: none; margin-bottom: 8px; }
+        .order-item:active { cursor: grabbing; }
+        .order-item.dragging { opacity: 0.5; background: var(--bg-hover); border-style: dashed; }
+        .order-item.over { border-color: var(--text-main); }
+        .engine-header { display: flex; align-items: center; gap: 10px; width: 100%; flex-wrap: wrap; }
+        .engine-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+        .engine-actions label { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 12px; }
+        .engine-actions button { background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 6px 10px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-secondary); transition: all 0.2s; }
+        .engine-actions button:hover { background: var(--bg-hover); color: var(--text-main); border-color: var(--border-focus); }
+        .engine-prompt-edit { display: none; margin-top: 10px; padding: 16px; background: var(--bg-hover); border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+        .engine-prompt-edit.active { display: block; animation: fadeIn 0.2s; }
+
+        .tpl-btn { padding: 8px 16px; font-size: 13px; font-weight: 600; border: 1px dashed var(--border-focus); border-radius: var(--radius-md); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; display: block; width: 100%; margin-top: 10px; }
+        .tpl-btn:hover { background: var(--bg-hover); color: var(--text-main); border-color: var(--text-main); }
+
+        /* Builder Sub-Sidebar Tools */
+        .tool-section { display: flex; flex-direction: column; gap: 12px; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .tool-section:last-child { border-bottom: none; padding-bottom: 0; }
+        .tool-heading { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; }
+
+        /* Sidebar Draggable Blocks (List Format) */
+        .sidebar-draggable-block { display: flex; align-items: center; gap: 10px; padding: 12px 10px; background: transparent; border: none; border-bottom: 1px solid var(--border-color); font-size: 12px; font-weight: 600; color: var(--text-main); cursor: grab; transition: background-color 0.2s; user-select: none; }
+        .sidebar-draggable-block:last-child { border-bottom: none; }
+        .sidebar-draggable-block:hover { background: var(--bg-hover); }
+        .sidebar-draggable-block:active { cursor: grabbing; }
+        .sidebar-draggable-block.dragging { opacity: 0.5; background: var(--bg-active); border: 1px dashed var(--border-focus); }
+
+        /* Dynamic Email Builder Workspace - Tiled Look */
+        #dynamic-blocks-container { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-panel); overflow: hidden; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .email-block { border: none; border-bottom: 1px solid var(--border-color); border-radius: 0; background: var(--bg-panel); overflow: hidden; transition: background-color 0.2s; }
+        .email-block:last-child { border-bottom: none; }
+        .email-block.dragging { opacity: 0.9; border: 1px solid var(--text-main); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-radius: var(--radius-md); z-index: 10; position: relative; }
+        
+        .email-block-header { padding: 14px 16px; background: var(--bg-panel); border-bottom: 1px solid transparent; font-weight: 600; font-size: 13px; color: var(--text-main); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; transition: background 0.2s; text-transform: uppercase; }
+        .email-block-header:hover { background: var(--bg-hover); }
+        .email-block.open .email-block-header { border-bottom-color: var(--border-color); background: var(--bg-hover); }
+        
+        .block-drag-handle { cursor: grab; margin-right: 12px; color: var(--text-muted); padding: 4px; display: inline-flex; align-items: center; }
+        .block-drag-handle:active { cursor: grabbing; }
+        .block-drag-handle:hover { color: var(--text-main); }
+        
+        .block-toggle-icon { transition: transform 0.3s; color: var(--text-muted); font-size: 10px; margin-right: 8px; }
+        .email-block.open .block-toggle-icon { transform: rotate(180deg); }
+
+        .block-type-badge { font-size: 10px; color: var(--text-secondary); text-transform: lowercase; font-weight: 600; padding-right: 15px;}
+
+        /* Blueprint Badges */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 800; background: var(--bg-badge); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid var(--border-color); }
+        .badge.blue { color: var(--text-info); background: var(--bg-info); border-color: rgba(37,99,235,0.2); }
+        .badge.green { color: var(--text-success); background: var(--bg-success); border-color: rgba(22,163,74,0.2); }
+        .badge.purple { color: #7e22ce; background: #f3e8ff; border-color: rgba(126,34,206,0.2); }
+        
+        /* Arabic Toggle Display Logic */
+        .email-block-grid { display: none; grid-template-columns: 1fr 1fr; }
+        .email-block.open .email-block-grid { display: grid; }
+        .email-block-grid > .email-field-wrapper:first-child { border-right: 1px solid var(--border-color); }
+        @media (max-width: 800px) { 
+            .email-block-grid { grid-template-columns: 1fr; } 
+            .email-block-grid > .email-field-wrapper:first-child { border-right: none; border-bottom: 1px solid var(--border-color); } 
+        }
+
+        body[data-arabic="false"] .email-block-grid { grid-template-columns: 1fr; }
+        body[data-arabic="false"] .email-field-wrapper[dir="rtl"] { display: none; }
+        body[data-arabic="false"] .email-block-grid > .email-field-wrapper:first-child { border-right: none; }
+        body[data-arabic="false"] .arabic-view-tab { display: none !important; }
+        
+        .email-field-wrapper { display: flex; flex-direction: column; background: var(--bg-panel); position: relative; }
+        .email-field-wrapper .toolbar { border: none; border-bottom: 1px solid var(--border-color); background: var(--bg-hover); padding: 8px 12px; margin: 0; display: flex; align-items: center; gap: 4px; overflow-x: auto; }
+        .email-field-wrapper .toolbar button { background: transparent; border: 1px solid transparent; padding: 4px 8px; font-size: 12px; cursor: pointer; border-radius: var(--radius-sm); font-weight: 600; color: var(--text-secondary); transition: all 0.2s; }
+        .email-field-wrapper .toolbar button:hover { background: var(--bg-panel); color: var(--text-main); border-color: var(--border-focus); }
+        
+        /* WYSIWYG Content Editable Styles */
+        .rich-text-editor, .email-field-wrapper input { border: none; border-radius: 0; padding: 16px; min-height: 120px; font-size: 14px; background: transparent; line-height: 1.6; color: var(--text-main); width: 100%; outline: none; transition: background-color 0.2s; overflow-y: auto; }
+        .email-field-wrapper input { min-height: auto; padding: 16px; }
+        .rich-text-editor:empty:before { content: attr(placeholder); color: var(--text-muted); pointer-events: none; }
+        .rich-text-editor:focus, .email-field-wrapper input:focus { background: var(--bg-hover); box-shadow: inset 4px 0 0 0 var(--text-main); z-index: 1; }
+        
+        /* Bullet point indentation inside rich text editors and preview container */
+        .rich-text-editor ul, .rich-text-editor ol, .email-preview-container ul, .email-preview-container ol { 
+            padding-left: 24px; margin-top: 8px; margin-bottom: 8px; 
+        }
+        .email-field-wrapper[dir="rtl"] .rich-text-editor ul, .email-field-wrapper[dir="rtl"] .rich-text-editor ol,
+        .email-preview-container [dir="rtl"] ul, .email-preview-container [dir="rtl"] ol {
+            padding-left: 0; padding-right: 24px;
+        }
+        
+        /* Preview Controls */
+        .preview-controls-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        
+        .email-preview-container { 
+            background: var(--bg-app); 
+            padding: 40px 0; 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-md); 
+            width: 100%; 
+            margin: 0 auto; 
+            overflow-x: auto; 
+            transition: max-width 0.3s ease; 
+            min-height: 600px; 
+            color: #000; 
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05); 
+        }
+        .mobile-frame { max-width: 375px !important; border: 12px solid #111; border-radius: 36px; padding: 0 !important; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.15); overflow-x: hidden; }
+
+        /* Drafts List */
+        .draft-list { display: flex; flex-direction: column; gap: 10px; }
+        .draft-row { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+        .draft-row:hover { border-color: var(--border-focus); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .draft-info { flex: 1; }
+        .draft-info h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--text-info); margin-bottom: 6px; letter-spacing: 0.02em; }
+        .draft-info p { font-size: 12px; color: var(--text-secondary); margin: 0; }
+        .draft-actions { display: flex; align-items: center; gap: 12px; }
+
+        /* Progress & Spinners */
+        .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .progress-bar { height: 4px; background: var(--border-color); border-radius: 2px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--text-main); width: 0%; transition: width 0.4s ease; }
+
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(17, 24, 39, 0.4); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-box { background: var(--bg-panel); border-radius: var(--radius-lg); padding: 2rem; width: 90%; max-width: 420px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color); }
+        .modal-box h4 { font-size: 18px; margin-bottom: 12px; color: var(--text-main); font-weight: 700; }
+        .modal-box input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-app); color: var(--text-main); margin-bottom: 24px; font-size: 14px; outline:none; transition: border 0.2s; }
+        .modal-box input:focus { border-color: var(--text-main); }
+        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+
+        /* Toasts */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; }
+        .toast { background: var(--text-main); color: var(--bg-panel); padding: 14px 20px; border-radius: var(--radius-md); font-size: 13px; font-weight: 600; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; }
+        .toast.show { transform: translateX(0); }
+    </style>
+</head>
+<body data-arabic="false">
+
+<div class="app-container">
+
+    <aside class="app-sidebar">
+        <div class="sidebar-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect><polyline points="3 7 12 13 21 7"></polyline></svg>
+            <h1>Email Builder</h1>
+        </div>
+        
+        <div class="sidebar-actions">
+            <button class="run-btn" onclick="document.getElementById('drafts-import-file').click()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                Import Data
+            </button>
+            <input type="file" id="drafts-import-file" style="display:none;" accept=".json" onchange="importDrafts(event)">
+            <select id="sidebar-drafts-dropdown" class="run-btn secondary" style="text-align: center; text-align-last: center; font-weight: 600; padding: 10px 14px;" onchange="loadDraftFromDropdown(this)">
+                <option value="" disabled selected>+ Load Draft</option>
+            </select>
+        </div>
+
+        <div id="sidebar-workspace-tools" style="flex: 1; padding: 1.25rem; overflow-y: auto; display: flex; flex-direction: column;">
+            
+            <div class="tool-section">
+                <span class="tool-heading">Template Skeleton</span>
+                <select id="email-type" class="field-group" style="margin:0;">
+                    </select>
+                <button class="run-btn secondary" onclick="loadTemplateBlocks()">Load Blocks</button>
+            </div>
+
+            <div class="tool-section" style="border-bottom: none;">
+                <span class="tool-heading">Add Content Block (Drag to Editor)</span>
+                <div id="sidebar-add-block-list" style="display: flex; flex-direction: column; margin-top: 10px; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+                    </div>
+            </div>
+
+        </div>
+    </aside>
+
+    <main class="app-main">
+        
+        <header class="top-bar">
+            <div class="search-mock">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; opacity:0.5;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Search by Email Name, subject, trigger, or team...
+            </div>
+            
+            <div class="top-nav">
+                <div class="top-nav-item active" id="nav-item-email" onclick="switchTab('email', this)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    Workspace
+                </div>
+                <div class="top-nav-item" id="nav-item-drafts" onclick="switchTab('drafts', this)">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        Drafts Library
+                    </div>
+                    <span class="top-nav-badge" id="draft-count-badge">0</span>
+                </div>
+                <div class="top-nav-item" id="nav-item-settings" onclick="switchTab('settings', this)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    Settings
+                </div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap: 15px;">
+                <span style="font-size:12px; color:var(--text-muted); font-weight:500;">Beta V4</span>
+                <button id="theme-toggle" class="run-btn secondary" style="width: 36px; height: 36px; padding: 0; border-radius: 50%;" onclick="toggleTheme()" title="Toggle Theme">🌙</button>
+            </div>
+        </header>
+
+        <div class="app-content">
+
+            <div id="tab-email" class="section active">
+                
+                <div class="section-title-wrap" style="justify-content: space-between;">
+                    <div style="display:flex; align-items:center; gap: 12px;">
+                        <span class="yellow-dot"></span>
+                        <h2 class="section-title">Email Workspace</h2>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="run-btn secondary" style="padding: 8px 16px; font-size: 12px; width:auto; color: var(--text-danger); border-color: rgba(220,38,38,0.2);" onclick="clearEmailFields()">Clear Workspace</button>
+                        <button class="run-btn" style="padding: 8px 16px; font-size: 12px; width:auto;" onclick="saveCurrentAsDraft()">Save as Draft</button>
+                    </div>
+                </div>
+
+                <div class="main-panel workspace-split">
+                    
+                    <div id="view-editor">
+                        <h3 class="split-header">Visual Builder</h3>
+
+                        <div class="editor-toolbar">
+                            <div class="editor-toolbar-item">
+                                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-right: auto; display:flex; align-items:center; gap:6px;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                    AI Assistant
+                                </span>
+                                <div style="display: flex; gap: 8px; width: 100%;">
+                                    <button class="run-btn" style="flex:1; padding: 6px 12px; font-size: 11px;" id="btn-email-review" onclick="runEmailReview()">Review English</button>
+                                    <button class="run-btn secondary" style="flex:1; padding: 6px 12px; font-size: 11px;" id="btn-translate-all" onclick="translateAllEmail()">Translate EN &rarr; AR</button>
+                                </div>
+                            </div>
+                            
+                            <div class="editor-toolbar-item">
+                                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-right: auto;">Language Mode:</span>
+                                <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 6px; cursor: pointer; width: 100%;">
+                                    <input type="checkbox" id="arabic-toggle" onchange="toggleArabicMode(this.checked)"> Enable Arabic Edition
+                                </label>
+                            </div>
+
+                            <div class="editor-toolbar-item">
+                                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-right: auto;">Global Alignment:</span>
+                                <select id="global-align" style="width: 100%; font-size: 12px; padding: 6px 10px;" onchange="updateTemplate()">
+                                    <option value="justify" selected>Justified Alignment</option>
+                                    <option value="side">Side Aligned (EN Left / AR Right)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="email-progress-container" style="display: none; margin-bottom: 1.5rem;">
+                            <div class="progress-bar"><div id="email-progress-fill" class="progress-fill"></div></div>
+                            <div id="email-status-text" style="font-size: 11px; color: var(--text-main); font-weight: 600;">Analyzing...</div>
+                        </div>
+
+                        <div id="dynamic-blocks-container">
+                            </div>
+                        <div id="empty-workspace-state" style="text-align: center; padding: 3rem; color: var(--text-muted); font-size: 13px; border: 1px dashed var(--border-focus); border-radius: var(--radius-lg); background: var(--bg-hover);">
+                            Your workspace is empty.<br>Drag and drop a block from the left menu here to get started.
+                        </div>
+                    </div>
+
+                    <div id="view-preview">
+                        <h3 class="split-header">Live Preview</h3>
+                        
+                        <div class="preview-controls-bar">
+                            <div style="display: flex; gap: 15px; align-items:center;">
+                                <div class="content-tabs" style="margin:0; border:none; gap:15px;">
+                                    <button class="content-tab ptab arabic-view-tab" style="padding: 0; text-transform:none;" onclick="setEmailPreviewMode('bilingual', this)">Bilingual</button>
+                                    <button class="content-tab ptab active ptab-en" style="padding: 0; text-transform:none;" onclick="setEmailPreviewMode('en', this)">English</button>
+                                    <button class="content-tab ptab arabic-view-tab" style="padding: 0; text-transform:none;" onclick="setEmailPreviewMode('ar', this)">Arabic</button>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <button class="run-btn secondary" style="padding: 6px 12px; font-size: 11px; width:auto;" onclick="setDeviceMode('desktop')" id="desktop_tab">Desktop</button>
+                                <button class="run-btn secondary" style="padding: 6px 12px; font-size: 11px; width:auto;" onclick="setDeviceMode('mobile')" id="mobile_tab">Mobile</button>
+                                <button class="run-btn" style="padding: 6px 16px; font-size: 11px; width:auto; margin-left:10px;" onclick="copyEmailHTML(emailPreviewMode)">Export HTML</button>
+                            </div>
+                        </div>
+                        
+                        <div class="email-preview-container" id="emailPreviewArea"></div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="tab-drafts" class="section">
+                
+                <div class="section-title-wrap" style="justify-content: space-between;">
+                    <div style="display:flex; align-items:center; gap: 12px;">
+                        <span class="yellow-dot"></span>
+                        <h2 class="section-title">Drafts Library</h2>
+                    </div>
+                    <button class="run-btn secondary" style="width: auto; padding: 8px 16px; font-size: 12px;" onclick="exportAllDrafts()">Export All Data</button>
+                </div>
+
+                <div class="card" style="padding: 2rem;">
+                    <div id="drafts-container" class="draft-list">
+                        </div>
+
+                    <div id="drafts-empty-state" style="display:none; text-align: center; padding: 4rem 2rem; color: var(--text-muted); font-size: 13px; border: 1px dashed var(--border-focus); border-radius: var(--radius-lg); background: var(--bg-hover);">
+                        No saved templates found.<br>Build something in the Workspace and save it as a draft!
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-settings" class="section">
+                
+                <div class="section-title-wrap">
+                    <span class="yellow-dot"></span>
+                    <h2 class="section-title">Settings & Config</h2>
+                </div>
+
+                <div class="card" style="padding: 2rem;">
+                    <div class="settings-layout">
+                        <div class="settings-sidebar">
+                            <button class="settings-nav-btn active" onclick="switchSettingGroup('config', this)">System Data</button>
+                            <button class="settings-nav-btn" onclick="switchSettingGroup('global_layout', this)">Global Elements</button>
+                            <button class="settings-nav-btn" onclick="switchSettingGroup('blocks', this)">Content Blocks</button>
+                            <button class="settings-nav-btn" onclick="switchSettingGroup('templates', this)">Structure Logic</button>
+                            <button class="settings-nav-btn" onclick="switchSettingGroup('style', this)">Style Guide</button>
+                            <button class="settings-nav-btn" onclick="switchSettingGroup('order', this)">AI Engines</button>
+                        </div>
+                        <div class="settings-content">
+                            <div id="sg-config" class="settings-group active">
+                                <h3>System Configuration & Data</h3>
+                                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem;">Manage AI keys and export/import your team configurations.</p>
+                                
+                                <div class="field-group" style="padding: 1.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-hover); margin-bottom: 1.5rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="font-size: 13px; display: block; color:var(--text-main);">Share Configuration</strong>
+                                            <span style="font-size: 12px; color: var(--text-secondary);">Settings auto-save to browser. Export JSON to share with colleagues.</span>
+                                        </div>
+                                        <div style="display: flex; gap: 8px;">
+                                            <button class="run-btn secondary" style="padding: 8px 16px; font-size: 12px; width: auto;" onclick="exportConfig()">Export .json</button>
+                                            <button class="run-btn" style="padding: 8px 16px; font-size: 12px; width: auto;" onclick="document.getElementById('config-upload').click()">Import .json</button>
+                                            <input type="file" id="config-upload" accept=".json" style="display:none;" onchange="importConfig(event)">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field-group">
+                                    <label>AI Provider</label>
+                                    <select id="llm-provider" onchange="updateProviderHint()">
+                                        <option value="gemini">Google Gemini (gemini-2.5-flash)</option>
+                                        <option value="openai">OpenAI (gpt-4o)</option>
+                                        <option value="anthropic">Anthropic (claude-3-5-sonnet)</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>API Key</label>
+                                    <input type="password" id="api-key-input" placeholder="Leave blank to use built-in Canvas AI, or enter Gemini key..." oninput="saveState()">
+                                    <span id="provider-hint" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Leave blank to use the built-in Canvas Gemini model, or enter your own key.</span>
+                                </div>
+                            </div>
+
+                            <div id="sg-global_layout" class="settings-group">
+                                <h3>Global Layout & Structure</h3>
+                                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem;">Configure the default elements that wrap around your block sequences.</p>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div class="field-group">
+                                        <label>Header Logo (EN)</label>
+                                        <input type="text" id="gl_headerLogoEn" placeholder="Image URL..." oninput="updateGlobalLayout()">
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Header Logo (AR)</label>
+                                        <input type="text" id="gl_headerLogoAr" placeholder="Image URL..." oninput="updateGlobalLayout()">
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div class="field-group">
+                                        <label>Footer Help Text (EN) [HTML Wrapper]</label>
+                                        <textarea id="gl_footerEn" rows="4" style="font-family: monospace; font-size: 11px;" oninput="updateGlobalLayout()"></textarea>
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Footer Help Text (AR) [HTML Wrapper]</label>
+                                        <textarea id="gl_footerAr" rows="4" style="font-family: monospace; font-size: 11px;" oninput="updateGlobalLayout()" dir="rtl"></textarea>
+                                    </div>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div class="field-group">
+                                        <label>Legal Footer (EN) [HTML Wrapper]</label>
+                                        <textarea id="gl_legalEn" rows="3" style="font-family: monospace; font-size: 11px;" oninput="updateGlobalLayout()"></textarea>
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Legal Footer (AR) [HTML Wrapper]</label>
+                                        <textarea id="gl_legalAr" rows="3" style="font-family: monospace; font-size: 11px;" oninput="updateGlobalLayout()" dir="rtl"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="sg-blocks" class="settings-group">
+                                <h3>Content Blocks Configuration</h3>
+                                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem;">Define the exact HTML wrapper and Input Type for every block available in your builder. Use <code>{{content}}</code>, <code>{{meta}}</code>, and <code>{{align}}</code> variables.</p>
+                                
+                                <ul id="blocks-config-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px;"></ul>
+                                <button class="tpl-btn" onclick="addNewBlockConfig()">+ Create New Block Type</button>
+                            </div>
+
+                            <div id="sg-templates" class="settings-group">
+                                <h3>Email Structure Guidelines</h3>
+                                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem;">Define structural logic and predefined block sequences to be loaded in the builder.</p>
+                                
+                                <ul id="email-tpl-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px;"></ul>
+                                <button class="tpl-btn" onclick="addNewConfigItem('email_tpl')">+ Add Email Template</button>
+                            </div>
+
+                            <div id="sg-style" class="settings-group">
+                                <h3>Email Style Guide</h3>
+                                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem;">Manage styling and terminology guidelines. These are appended to AI prompts when evaluating drafts.</p>
+                                
+                                <ul id="email-style-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px;"></ul>
+                                <button class="tpl-btn" onclick="addNewConfigItem('email_style')">+ Add Email Guideline</button>
+                            </div>
+
+                            <div id="sg-order" class="settings-group">
+                                <h3>AI Review Engines</h3>
+                                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 1.5rem;">Drag to reorder engines. Use checkboxes to enable/disable them for email reviews.</p>
+                                <ul id="engine-order-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px;"></ul>
+                                <button class="tpl-btn" onclick="addNewEngine()">+ Add Engine</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<div id="toast-container"></div>
+<div class="modal-overlay" id="custom-modal">
+    <div class="modal-box">
+        <h4 id="modal-title">Prompt</h4>
+        <input type="text" id="modal-input" />
+        <div id="modal-body" style="font-size:13px; margin-bottom:15px; color:var(--text-secondary);"></div>
+        <div class="modal-actions">
+            <button class="run-btn secondary" style="width:auto; padding:8px 16px;" onclick="closeModal()">Cancel</button>
+            <button class="run-btn" style="width:auto; padding:8px 16px;" onclick="submitModal()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global Constants & Configurations
+    const apiKey = ""; // Provided by environment
+
+    // Default Configurations
+    let ENGINE_CONFIG = [
+        { id: 'grammar', label: 'Grammar & Clarity', prompt: 'Review for grammar, spelling, and sentence clarity. Flag sentences > 25 words. Ensure active voice.', isActive: true },
+        { id: 'tone', label: 'Tone & Voice', prompt: 'Check against tone guide. Ensure direct address ("you"). Remove jargon. Check action-orientation.', isActive: true },
+        { id: 'terminology', label: 'Terminology', prompt: 'Check every term against the glossary. Ensure lowercase brand names.', isActive: true },
+        { id: 'structure', label: 'Structure', prompt: 'Verify against template. Ensure sections flow logically and formatting is consistent.', isActive: true },
+        { id: 'quality', label: 'Overall Quality', prompt: 'Holistic review. Is the content helpful, concise, and professional?', isActive: true }
+    ];
+
+    let EMAIL_STYLE_CONFIG = [
+        { id: 'em_style_tone', label: 'Tone & Voice', content: 'Professional, warm, and concise. Address the user directly. Action-oriented.' },
+        { id: 'em_style_terms', label: 'Terminology', content: '- Brand names (lowercase)\n- Support Center (for help links)\n- Tap (not click)' }
+    ];
+
+    let BLOCKS_CONFIG = [
+        { 
+            id: 'title', 
+            label: 'Title & Subtitle (Yellow Line)', 
+            inputType: 'title_subtitle', 
+            html: '<div style="font-family: Helvetica, Arial, sans-serif; padding-top: 15px; padding-bottom: 10px; text-align: {{align}};"><div style="font-size: 24px; font-weight: bold; color: #000000; margin-bottom: 6px;">{{content}}</div><div style="font-size: 16px; color: #5f5e5a; margin-bottom: 16px;">{{meta}}</div><div style="width: 40px; height: 4px; background-color: #fce300; display: inline-block; border-radius: 2px;"></div></div>' 
+        },
+        { id: 'subtitle', label: 'Section Subtitle (H2)', inputType: 'text', html: '<div style="font-size: 18px; line-height: 24px; font-weight: 600; color: #1a1a1a; padding-top: 5px; padding-bottom: 0px; margin: 0; text-align: {{align}};">{{content}}</div>' },
+        { id: 'text', label: 'Standard Text Paragraph', inputType: 'richtext', html: '<div style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; text-align: {{align}}; padding-top: 10px;">{{content}}</div>' },
+        { id: 'otp_box', label: 'OTP / Verification Box', inputType: 'text', html: '<div style="background-color: #f9f9f9; border-radius: 8px; padding: 24px; text-align: center; margin: 15px 0;"><span style="font-size: 36px; font-weight: bold; color: #000000; letter-spacing: 6px; font-family: Helvetica, monospace;">{{content}}</span></div>' },
+        { id: 'alert_danger', label: 'Alert Box (Danger)', inputType: 'richtext', html: '<div style="background-color: #fee2e2; border-left: 4px solid #ef4444; border-radius: 8px; padding: 16px 20px; color: #333333; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; text-align: {{align}}; margin: 10px 0;">{{content}}</div>' },
+        { id: 'alert_info', label: 'Alert Box (Info)', inputType: 'richtext', html: '<div style="background-color: #e0f2fe; border-left: 4px solid #0ea5e9; border-radius: 8px; padding: 16px 20px; color: #333333; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; text-align: {{align}}; margin: 10px 0;">{{content}}</div>' },
+        { id: 'alert_success', label: 'Alert Box (Success)', inputType: 'richtext', html: '<div style="background-color: #dcfce7; border-left: 4px solid #22c55e; border-radius: 8px; padding: 16px 20px; color: #333333; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; text-align: {{align}}; margin: 10px 0;">{{content}}</div>' },
+        { id: 'highlight_yellow', label: 'Highlight Box (Yellow)', inputType: 'richtext', html: '<div style="background-color: #fefce7; border-left: 4px solid #facc15; border-radius: 8px; padding: 16px 20px; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; color: #333333; text-align: {{align}}; margin: 10px 0;">{{content}}</div>' },
+        { 
+          id: 'highlight_green', 
+          label: 'Highlight Box (Green List)', 
+          inputType: 'list', 
+          html: '<div style="background-color: #f2fbf5; border-radius: 8px; padding: 25px 20px; font-family: Helvetica, Arial, sans-serif; text-align: {{align}}; margin: 10px 0;"><table border="0" cellpadding="0" cellspacing="0" width="100%">{{items}}</table></div>',
+          itemHtml: '<tr><td valign="top" style="width: 24px; color: #166534; font-weight: 300; font-size: 24px; line-height: 20px; padding: 12px 8px 12px 0;">+</td><td valign="top" style="padding: 12px 16px 12px 5px; border-bottom: 1px solid #d1fae5;"><strong style="color: #000000; font-size: 14px; font-weight: bold; display: block; margin-bottom: 2px; line-height: 1.3;">{{item_title}}</strong><span style="color: #5f5e5a; font-size: 13px; line-height: 1.4;">{{item_desc}}</span></td></tr>',
+          defaultContent: '[{"title":"Highlight Title 1", "desc":"Short description for the highlight goes here.", "linkText":"", "linkUrl":""}, {"title":"Highlight Title 2", "desc":"Another short description goes here.", "linkText":"", "linkUrl":""}]'
+        },
+        { 
+          id: 'numbered_steps', 
+          label: 'Numbered Steps', 
+          inputType: 'list', 
+          html: '<div style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; text-align: {{align}}; margin: 15px 0;"><div style="font-size: 18px; font-weight: bold; color: #000000; margin-bottom: 15px;">{{meta}}</div><div style="background-color: #ffffff; border-radius: 8px; border: 1px solid #eeeeee; padding: 10px 0;"><table border="0" cellpadding="0" cellspacing="0" width="100%">{{items}}</table></div></div>',
+          itemHtml: '<tr><td valign="top" style="width: 32px; padding: 12px 0 12px 16px; font-size: 15px; font-weight: bold; color: #1a1a1a; line-height: 1.4;">{{item_index}}.</td><td valign="top" style="padding: 12px 16px 12px 5px;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td valign="top"><div style="color: #000000; font-size: 14px; font-weight: bold; margin-bottom: 2px; line-height: 1.3;">{{item_title}}</div><div style="color: #5f5e5a; font-size: 13px; line-height: 1.4;">{{item_desc}}</div></td>{{item_link_html}}</tr></table></td></tr>',
+          defaultMeta: 'Steps to follow:',
+          defaultMetaAr: 'الخطوات التالية:',
+          defaultContent: '[{"title":"Step One", "desc":"First step description.", "linkText":"", "linkUrl":""}, {"title":"Step Two", "desc":"Second step description.", "linkText":"", "linkUrl":""}]',
+          defaultContentAr: '[{"title":"الخطوة الأولى", "desc":"وصف الخطوة الأولى.", "linkText":"", "linkUrl":""}, {"title":"الخطوة الثانية", "desc":"وصف الخطوة الثانية.", "linkText":"", "linkUrl":""}]'
+        },
+        { 
+          id: 'next_steps', 
+          label: 'Next Steps Block', 
+          inputType: 'list', 
+          html: '<div style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; text-align: {{align}}; margin: 15px 0;"><div style="font-size: 18px; font-weight: bold; color: #000000; margin-bottom: 15px;">{{meta}}</div><div style="background-color: #ffffff; border-radius: 8px; border: 1px solid #eeeeee;"><table border="0" cellpadding="0" cellspacing="0" width="100%">{{items}}</table></div></div>',
+          itemHtml: '<tr><td valign="top" style="width: 24px; padding: 16px 0 16px 16px; font-size: 18px; color: #1a1a1a; line-height: 1.2;">&#8594;</td><td valign="top" style="padding: 16px 16px 16px 10px; border-bottom: 1px solid #eeeeee;"><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td valign="top"><div style="color: #000000; font-size: 14px; font-weight: bold; margin-bottom: 1px; line-height: 1.2;">{{item_title}}</div><div style="color: #5f5e5a; font-size: 13px; line-height: 1.3;">{{item_desc}}</div></td>{{item_link_html}}</tr></table></td></tr>',
+          defaultMeta: 'Next Steps:',
+          defaultMetaAr: 'الخطوات التالية:',
+          defaultContent: '[{"title":"On-time Fulfillment", "desc":"Ensure consistent on-time fulfilment to retain your Express status.", "linkText":"", "linkUrl":""}, {"title":"Maintain Inventory", "desc":"Maintain adequate inventory levels to prevent stockouts.", "linkText":"", "linkUrl":""}, {"title":"Learn More", "desc":"Learn more about the Express Program", "linkText":"Here \u2192", "linkUrl":"#"}]',
+          defaultContentAr: '[{"title":"التنفيذ في الوقت المحدد", "desc":"تأكد من التنفيذ في الوقت المحدد للاحتفاظ بحالة إكسبرس الخاصة بك.", "linkText":"", "linkUrl":""}, {"title":"الحفاظ على المخزون", "desc":"حافظ على مستويات مخزون مناسبة لمنع نفاد المخزون.", "linkText":"", "linkUrl":""}, {"title":"اعرف المزيد", "desc":"تعرف على المزيد حول برنامج إكسبرس", "linkText":"هنا \u2190", "linkUrl":"#"}]'
+        },
+        { id: 'image', label: 'Hero Banner / Image', inputType: 'image', html: '<img src="{{content}}" alt="{{meta}}" style="max-width:100%; height:auto; display:block; border:0; margin: 10px auto;" />' },
+        { id: 'button', label: 'Primary Button', inputType: 'button', html: '<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 15px 0;"><tr><td align="{{align}}"><a href="{{meta}}" style="display:inline-block; padding:14px 28px; background-color:#fce300; color:#000000; text-decoration:none; border-radius:4px; font-weight:bold; font-family: Helvetica, Arial, sans-serif; font-size: 16px;">{{content}}</a></td></tr></table>' },
+        { id: 'divider', label: 'Divider Line', inputType: 'divider', html: '<hr style="border:none; border-top:1px solid #eeeeee; margin: 15px 0;" />' },
+        { id: 'table', label: 'Data Table', inputType: 'table', html: '{{content}}', defaultContent: '{"headers":["Column 1","Column 2","Column 3"],"rows":[["","",""],[""  ,"",""]]}', defaultContentAr: '{"headers":["العمود 1","العمود 2","العمود 3"],"rows":[["","",""],[""  ,"",""]]}' },
+        { id: 'custom_html', label: 'Custom HTML Block', inputType: 'custom_html', html: '{{content}}', defaultContent: '<!-- Paste your custom HTML here -->' }
+    ];
+
+    let GLOBAL_LAYOUT_CONFIG = {
+        headerLogoEn: "https://f.nooncdn.com/s/app/com/noon/design-system/logos/revamp-logo-en-smaller.svg",
+        headerLogoAr: "https://f.nooncdn.com/s/app/com/noon/design-system/logos/noon-logo-ar-2026.svg",
+        footerEn: `<table class="email-content-table" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-bottom: 1px solid #dddddd;"><tbody><tr><td align="center" style="padding-bottom: 20px;"><table class="email-content-table" align="center" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; font-size: 11px; font-family: Helvetica, Arial, sans-serif; color: #000000; line-height: 1.4;"><tbody><tr><td colspan="5" align="center" class="help-header-cell" style="padding-bottom: 15px; text-align: center;"><strong style="font-size: 13px; display: block; width: 100%; text-align: center;">Need Help?</strong></td></tr><tr><td class="help-col" align="center" valign="top" style="padding: 0 5px; width: 33%; text-align: center;"><span style="display: block; text-align: center; width: 100%; white-space: nowrap;">For more information, visit</span><a href="https://support.noon.partners/portal/en/kb/seller-help-center" style="color: #0000EE; text-decoration: none; font-weight: bold; font-size: 12px; white-space: nowrap; display: block; text-align: center; width: 100%;">Help Center</a></td><td class="help-sep" width="1" align="center" valign="middle" style="width: 1px !important; padding: 0;"><div style="height: 25px; background-color: #dddddd; width: 1px; font-size: 1px; line-height: 1px;">&nbsp;</div></td><td class="help-col" align="center" valign="top" style="padding: 0 5px; width: 33%; text-align: center;"><span style="display: block; text-align: center; width: 100%; white-space: nowrap;">Raise a ticket on</span><a href="https://login.noon.partners/en/?domain=https%3A%2F%2Fnoon-store.noon.partners%2Fen%2Fsupport-center%2F%3F" style="color: #0000EE; text-decoration: none; font-weight: bold; font-size: 12px; white-space: nowrap; display: block; text-align: center; width: 100%;">Support Center</a></td><td class="help-sep" width="1" align="center" valign="middle" style="width: 1px !important; padding: 0;"><div style="height: 25px; background-color: #dddddd; width: 1px; font-size: 1px; line-height: 1px;">&nbsp;</div></td><td class="help-col" align="center" valign="top" style="padding: 0 5px; width: 33%; text-align: center;"><span style="display: block; text-align: center; width: 100%; white-space: nowrap;">Email us at</span><a href="mailto:seller@noon.com" style="color: #0000EE; text-decoration: none; font-weight: bold; font-size: 12px; white-space: nowrap; display: block; text-align: center; width: 100%;">seller@noon.com</a></td></tr></tbody></table></td></tr></tbody></table><div style="height: 20px; font-size: 1px; line-height: 1px;">&nbsp;</div><table class="email-content-table" align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto; width: auto !important;"><tbody><tr><td style="padding: 0 10px;"><a href="https://www.facebook.com/noon"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="16" height="16" alt="Facebook" style="opacity: 0.6; display: block;"></a></td><td style="padding: 0 10px;"><a href="https://www.instagram.com/noon"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" width="16" height="16" alt="Instagram" style="opacity: 0.6; display: block;"></a></td><td style="padding: 0 10px;"><a href="https://www.linkedin.com/company/nooncom"><img src="https://cdn-icons-png.flaticon.com/512/733/733561.png" width="16" height="16" alt="LinkedIn" style="opacity: 0.6; display: block;"></a></td><td style="padding: 0 10px;"><a href="https://www.tiktok.com/@noon"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" width="16" height="16" alt="TikTok" style="opacity: 0.6; display: block;"></a></td><td style="padding: 0 10px;"><a href="https://x.com/noon"><img src="https://cdn-icons-png.flaticon.com/512/5969/5969020.png" width="16" height="16" alt="X" style="opacity: 0.6; display: block;"></a></td></tr></tbody></table>`,
+        footerAr: `<table class="email-content-table" width="100%" border="0" cellpadding="0" cellspacing="0" style="border-bottom: 1px solid #dddddd;" dir="rtl"><tbody><tr><td align="center" style="padding-bottom: 20px;"><table class="email-content-table" align="center" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; font-size: 11px; font-family: Helvetica, Arial, sans-serif; color: #000000; line-height: 1.4;"><tbody><tr><td colspan="5" align="center" class="help-header-cell" style="padding-bottom: 15px; text-align: center;"><strong style="font-size: 13px; display: block; width: 100%; text-align: center;">هل تحتاج للمساعدة؟</strong></td></tr><tr><td class="help-col" align="center" valign="top" style="padding: 0 5px; width: 33%; text-align: center;"><span style="display: block; text-align: center; width: 100%; white-space: nowrap;">لمزيد من المعلومات، قم بزيارة</span><a href="https://support.noon.partners/portal/en/kb/seller-help-center" style="color: #0000EE; text-decoration: none; font-weight: bold; font-size: 12px; white-space: nowrap; display: block; text-align: center; width: 100%;">مركز المساعدة</a></td><td class="help-sep" width="1" align="center" valign="middle" style="width: 1px !important; padding: 0;"><div style="height: 25px; background-color: #dddddd; width: 1px; font-size: 1px; line-height: 1px;">&nbsp;</div></td><td class="help-col" align="center" valign="top" style="padding: 0 5px; width: 33%; text-align: center;"><span style="display: block; text-align: center; width: 100%; white-space: nowrap;">ارفع تذكرة عبر</span><a href="https://login.noon.partners/en/?domain=https%3A%2F%2Fnoon-store.noon.partners%2Fen%2Fsupport-center%2F%3F" style="color: #0000EE; text-decoration: none; font-weight: bold; font-size: 12px; white-space: nowrap; display: block; text-align: center; width: 100%;">مركز الدعم</a></td><td class="help-sep" width="1" align="center" valign="middle" style="width: 1px !important; padding: 0;"><div style="height: 25px; background-color: #dddddd; width: 1px; font-size: 1px; line-height: 1px;">&nbsp;</div></td><td class="help-col" align="center" valign="top" style="padding: 0 5px; width: 33%; text-align: center;"><span style="display: block; text-align: center; width: 100%; white-space: nowrap;">راسلنا على</span><a href="mailto:seller@noon.com" style="color: #0000EE; text-decoration: none; font-weight: bold; font-size: 12px; white-space: nowrap; display: block; text-align: center; width: 100%;">seller@noon.com</a></td></tr></tbody></table></td></tr></tbody></table><div style="height: 20px; font-size: 1px; line-height: 1px;">&nbsp;</div><table class="email-content-table" align="center" border="0" cellpadding="0" cellspacing="0" dir="ltr" style="margin: 0 auto; width: auto !important;"><tbody><tr><td style="padding: 0 10px;"><a href="https://www.facebook.com/noon"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" width="16" height="16" alt="Facebook" style="opacity: 0.6; display: block;"></a></td><td style="padding: 0 10px;"><a href="https://www.instagram.com/noon"><img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" width="16" height="16" alt="Instagram" style="opacity: 0.6; display: block;"></a></td><td style="padding: 0 10px;"><a href="https://www.linkedin.com/company/nooncom"><img src="https://cdn-icons-png.flaticon.com/512/733/733561.png" width="16" height="16" alt="LinkedIn" style="opacity: 0.6; display: block;"></a></td><td style="padding: 0 10px;"><a href="https://www.tiktok.com/@noon"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" width="16" height="16" alt="TikTok" style="opacity: 0.6; display: block;"></a></td><td style="padding: 0 10px;"><a href="https://x.com/noon"><img src="https://cdn-icons-png.flaticon.com/512/5969/5969020.png" width="16" height="16" alt="X" style="opacity: 0.6; display: block;"></a></td></tr></tbody></table>`,
+        legalEn: `<div style="font-size:12px; line-height:1.6; text-align:center; color:#666666; padding-top: 20px;"><p style="margin: 0;">You are receiving this email as a registered seller on <a href="http://noon.com" style="color: #666666; text-decoration: none;">noon.com</a>.</p></div>`,
+        legalAr: `<div style="font-size:12px; line-height:1.6; text-align:center; color:#666666; padding-top: 20px;" dir="rtl"><p style="margin: 0;">تصلك هذه الرسالة لأنك بائع مسجل في <a href="http://noon.com" style="color: #666666; text-decoration: none;">noon.com</a>.</p></div>`
+    };
+
+    let EMAIL_TPL_CONFIG = [
+        { id: 'em_announce', label: 'Announcement', content: '1. Title: Exciting new feature\n2. Intro: Hook the user in 1 sentence\n3. Highlight: The core benefit\n4. Body: Details\n5. Conclusion: CTA', blocks: ['title', 'text', 'highlight_yellow', 'text', 'button'] },
+        { id: 'em_update', label: 'Policy Update', content: '1. Title: What changed\n2. Intro: Why it happened\n3. Highlight: Key dates\n4. Body: Changes\n5. Conclusion: Help', blocks: ['title', 'text', 'alert_danger', 'text', 'next_steps'] },
+        { id: 'em_otp', label: 'OTP / Verification', content: '1. Title: Verify your email\n2. Text: Enter the code below\n3. OTP Box\n4. Text: Expiry warning', blocks: ['title', 'text', 'otp_box', 'text'] }
+    ];
+
+    // State Variables
+    let emailPreviewMode = 'en'; 
+    let currentDevice = 'desktop';
+    let dragSourceEl = null;
+    let activeConfigPanels = new Set(); 
+    let SAVED_DRAFTS = [];
+
+    // --- AUTO-SAVE & IMPORT/EXPORT LOGIC ---
+    function saveState() {
+        const data = {
+            ENGINE_CONFIG, EMAIL_STYLE_CONFIG, BLOCKS_CONFIG, EMAIL_TPL_CONFIG, GLOBAL_LAYOUT_CONFIG,
+            apiKey: document.getElementById('api-key-input').value
+        };
+        localStorage.setItem('email_content_hub_config', JSON.stringify(data));
+        localStorage.setItem('email_content_hub_library', JSON.stringify(SAVED_DRAFTS));
+        updateDraftBadge();
+    }
+
+    function loadState() {
+        const storedConfig = localStorage.getItem('email_content_hub_config');
+        if (storedConfig) {
+            try {
+                const data = JSON.parse(storedConfig);
+                if (data.ENGINE_CONFIG) ENGINE_CONFIG = data.ENGINE_CONFIG;
+                if (data.EMAIL_STYLE_CONFIG) EMAIL_STYLE_CONFIG = data.EMAIL_STYLE_CONFIG;
+                if (data.BLOCKS_CONFIG) BLOCKS_CONFIG = data.BLOCKS_CONFIG;
+                if (data.EMAIL_TPL_CONFIG) EMAIL_TPL_CONFIG = data.EMAIL_TPL_CONFIG;
+                if (data.GLOBAL_LAYOUT_CONFIG) GLOBAL_LAYOUT_CONFIG = { ...GLOBAL_LAYOUT_CONFIG, ...data.GLOBAL_LAYOUT_CONFIG };
+                if (data.apiKey) document.getElementById('api-key-input').value = data.apiKey;
+            } catch(e) { console.error("Could not load local config."); }
+        }
+
+        const storedLibrary = localStorage.getItem('email_content_hub_library');
+        if (storedLibrary) {
+            try {
+                SAVED_DRAFTS = JSON.parse(storedLibrary);
+                renderDraftsLibrary();
+            } catch(e) { console.error("Could not load local library."); }
+        }
+        updateDraftBadge();
+    }
+
+    function updateDraftBadge() {
+        document.getElementById('draft-count-badge').innerText = SAVED_DRAFTS.length;
+    }
+
+    function exportConfig() {
+        const data = { ENGINE_CONFIG, EMAIL_STYLE_CONFIG, BLOCKS_CONFIG, EMAIL_TPL_CONFIG, GLOBAL_LAYOUT_CONFIG };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `email_content_config_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        showToast("Configuration Exported", "success");
+    }
+
+    function importConfig(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                if (data.ENGINE_CONFIG) ENGINE_CONFIG = data.ENGINE_CONFIG;
+                if (data.EMAIL_STYLE_CONFIG) EMAIL_STYLE_CONFIG = data.EMAIL_STYLE_CONFIG;
+                if (data.BLOCKS_CONFIG) BLOCKS_CONFIG = data.BLOCKS_CONFIG;
+                if (data.EMAIL_TPL_CONFIG) EMAIL_TPL_CONFIG = data.EMAIL_TPL_CONFIG;
+                if (data.GLOBAL_LAYOUT_CONFIG) GLOBAL_LAYOUT_CONFIG = { ...GLOBAL_LAYOUT_CONFIG, ...data.GLOBAL_LAYOUT_CONFIG };
+                saveState();
+                renderSettingsEngines();
+                renderAllConfigs();
+                populateGlobalLayoutInputs();
+                showToast("Configuration Imported successfully!", "success");
+            } catch(err) {
+                showToast("Invalid JSON file.", "error");
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = ''; 
+    }
+
+    // --- DRAFTS LIBRARY LOGIC ---
+    function saveCurrentAsDraft() {
+        const blocks = getBlocksData();
+        if (blocks.length === 0) return showToast("No content to save. Add some blocks first.", "error");
+
+        showModal("Save Template Draft", "Template Name (e.g. Policy Update V2)", (name) => {
+            const newDraft = {
+                id: 'draft_' + Date.now(),
+                name: name,
+                timestamp: new Date().toISOString(),
+                blocks: blocks,
+                globalAlign: document.getElementById('global-align').value
+            };
+            SAVED_DRAFTS.unshift(newDraft); 
+            saveState();
+            renderDraftsLibrary();
+            showToast(`Draft "${name}" saved to library.`, "success");
+        });
+    }
+
+    function renderDraftsLibrary() {
+        const container = document.getElementById('drafts-container');
+        const emptyState = document.getElementById('drafts-empty-state');
+        const searchInputEl = document.getElementById('draft-search-input');
+        const searchInput = searchInputEl ? searchInputEl.value.toLowerCase() : "";
+        
+        container.innerHTML = '';
+        
+        const filtered = SAVED_DRAFTS.filter(d => d.name.toLowerCase().includes(searchInput));
+
+        if (filtered.length === 0) {
+            emptyState.style.display = searchInput ? 'none' : 'block';
+            if (searchInput) container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No drafts match your search.</p>';
+            return;
+        } else {
+            emptyState.style.display = 'none';
+        }
+
+        const badges = ['blue', 'green', 'purple'];
+
+        filtered.forEach((draft, idx) => {
+            const date = new Date(draft.timestamp).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+            const row = document.createElement('div');
+            row.className = 'draft-row';
+            const randomBadgeColor = badges[idx % badges.length];
+            
+            row.innerHTML = `
+                <div class="draft-info">
+                    <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--text-info); margin-bottom: 4px; letter-spacing: 0.05em;">${draft.name}</h4>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 0;">${date} • ${draft.blocks.length} blocks mapped</p>
+                </div>
+                <div class="draft-actions">
+                    <span class="badge ${randomBadgeColor}" style="margin-right: 15px;">SAVED TEMPLATE</span>
+                    <button class="run-btn secondary" style="padding: 6px 12px; font-size: 11px; width:auto;" onclick="loadDraft('${draft.id}')">Load to Editor</button>
+                    <button class="run-btn secondary" style="padding: 6px 12px; font-size: 11px; width:auto;" onclick="renameDraft('${draft.id}')">Rename</button>
+                    <button class="run-btn secondary" style="padding: 6px 10px; font-size: 11px; color: var(--text-danger); width:auto;" onclick="deleteDraft('${draft.id}', event)">🗑️</button>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+
+        updateSidebarDraftsDropdown();
+    }
+
+    function updateSidebarDraftsDropdown() {
+        const sel = document.getElementById('sidebar-drafts-dropdown');
+        if(!sel) return;
+        sel.innerHTML = '<option value="" disabled selected>+ Load Draft</option>';
+        SAVED_DRAFTS.forEach(draft => {
+            sel.appendChild(new Option(draft.name, draft.id));
+        });
+    }
+
+    function loadDraftFromDropdown(sel) {
+        if(sel.value) {
+            loadDraft(sel.value);
+            sel.value = ""; 
+        }
+    }
+
+    function loadDraft(id) {
+        const draft = SAVED_DRAFTS.find(d => d.id === id);
+        if (!draft) return;
+
+        if (!confirm(`Loading "${draft.name}" will replace your current workspace. Continue?`)) return;
+
+        const container = document.getElementById('dynamic-blocks-container');
+        container.innerHTML = '';
+        
+        document.getElementById('global-align').value = draft.globalAlign || 'justify';
+        
+        draft.blocks.forEach(b => {
+            addEmailBlock(b.type, { ...b, isTemplate: false });
+        });
+
+        switchTab('email', document.getElementById('nav-item-email'));
+        updateTemplate();
+        showToast(`Loaded draft: ${draft.name}`, "success");
+    }
+
+    function deleteDraft(id, e) {
+        if(e) e.stopPropagation();
+        if(!confirm("Are you sure you want to permanently delete this draft?")) return;
+        
+        SAVED_DRAFTS = SAVED_DRAFTS.filter(d => d.id !== id);
+        saveState();
+        renderDraftsLibrary();
+        showToast("Draft deleted.", "info");
+    }
+
+    function renameDraft(id) {
+        const draft = SAVED_DRAFTS.find(d => d.id === id);
+        if(!draft) return;
+        
+        showModal("Rename Draft", draft.name, (newName) => {
+            draft.name = newName;
+            saveState();
+            renderDraftsLibrary();
+            showToast("Draft renamed.", "success");
+        });
+    }
+
+    function exportAllDrafts() {
+        if(SAVED_DRAFTS.length === 0) return showToast("No drafts to export.", "error");
+        
+        const blob = new Blob([JSON.stringify(SAVED_DRAFTS, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `email_drafts_library_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        showToast(`Exported ${SAVED_DRAFTS.length} drafts.`, "success");
+    }
+
+    function importDrafts(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                if (Array.isArray(data)) {
+                    if (confirm(`Import ${data.length} drafts? This will merge with your existing library.`)) {
+                        SAVED_DRAFTS = [...data, ...SAVED_DRAFTS];
+                        const uniqueMap = new Map();
+                        SAVED_DRAFTS.forEach(d => uniqueMap.set(d.id, d));
+                        SAVED_DRAFTS = Array.from(uniqueMap.values());
+                        
+                        saveState();
+                        renderDraftsLibrary();
+                        showToast(`Imported ${data.length} drafts successfully.`, "success");
+                    }
+                } else {
+                    showToast("Invalid library file format.", "error");
+                }
+            } catch(err) {
+                showToast("Invalid JSON file.", "error");
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = ''; 
+    }
+
+    // Modal & Toast Utils
+    function showToast(msg, type='info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        let icon = type === 'success' ? '✅' : (type === 'error' ? '⚠️' : 'ℹ️');
+        toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+        container.appendChild(toast);
+        requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3500);
+    }
+
+    let modalCallback = null;
+    function showModal(title, placeholder, callback, bodyText="") {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-body').innerText = bodyText;
+        const input = document.getElementById('modal-input');
+        if (placeholder === null) {
+            input.style.display = 'none';
+        } else {
+            input.style.display = 'block';
+            input.placeholder = placeholder;
+            input.value = placeholder !== "Template Name (e.g. Policy Update V2)" ? placeholder : "";
+            input.onkeydown = function(e) {
+                if (e.key === 'Enter') submitModal();
+            };
+        }
+        document.getElementById('custom-modal').style.display = 'flex';
+        if (placeholder !== null) input.focus();
+        modalCallback = callback;
+    }
+    function closeModal() { document.getElementById('custom-modal').style.display = 'none'; }
+    function submitModal() {
+        const input = document.getElementById('modal-input');
+        const val = input.style.display === 'none' ? true : input.value.trim();
+        closeModal();
+        if(modalCallback && val) modalCallback(val);
+    }
+
+    // Initialization
+    window.onload = () => {
+        loadState(); 
+        
+        const savedTheme = localStorage.getItem('email-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-toggle').innerText = savedTheme === 'dark' ? '☀️' : '🌙';
+
+        const savedArabic = localStorage.getItem('email-arabic-enabled') === 'true';
+        document.body.setAttribute('data-arabic', savedArabic);
+        const arToggle = document.getElementById('arabic-toggle');
+        if(arToggle) arToggle.checked = savedArabic;
+        if (!savedArabic) setEmailPreviewMode('en', document.querySelector('.ptab-en'));
+
+        renderSettingsEngines();
+        populateGlobalLayoutInputs();
+        renderAllConfigs();
+        updateProviderHint();
+        setupEditorPasting(); 
+        loadDrafts(); 
+        
+        const container = document.getElementById('dynamic-blocks-container');
+        const emptyState = document.getElementById('empty-workspace-state');
+
+        [container, emptyState].forEach(el => {
+            el.addEventListener('dragover', handleDragOver);
+            el.addEventListener('drop', function(e) {
+                if (e.target !== container && e.target !== emptyState && !emptyState.contains(e.target)) return;
+                if (e.stopPropagation) e.stopPropagation();
+                if (!dragSourceEl) return false;
+                
+                if (dragSourceEl.classList.contains('sidebar-draggable-block')) {
+                    addEmailBlock(dragSourceEl.dataset.type);
+                } else if (dragSourceEl.classList.contains('email-block')) {
+                    container.appendChild(dragSourceEl);
+                    updateTemplate();
+                }
+                return false;
+            });
+        });
+    };
+
+    function toggleArabicMode(enabled) {
+        document.body.setAttribute('data-arabic', enabled);
+        localStorage.setItem('email-arabic-enabled', enabled);
+        
+        if (!enabled && (emailPreviewMode === 'bilingual' || emailPreviewMode === 'ar')) {
+            setEmailPreviewMode('en', document.querySelector('.ptab-en'));
+        }
+        updateTemplate();
+    }
+
+    function toggleTheme() {
+        const root = document.documentElement;
+        const currentTheme = root.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', newTheme);
+        localStorage.setItem('email-theme', newTheme);
+        document.getElementById('theme-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
+    }
+
+    function switchTab(tab, el) {
+        document.querySelectorAll('.top-nav-item').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        
+        if(el) el.classList.add('active');
+        else document.getElementById(`nav-item-${tab}`).classList.add('active');
+        
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        
+        const workspaceTools = document.getElementById('sidebar-workspace-tools');
+        if (workspaceTools) {
+            workspaceTools.style.display = tab === 'email' ? 'flex' : 'none';
+        }
+
+        if (tab === 'drafts') renderDraftsLibrary();
+    }
+
+    function checkEmptyWorkspace() {
+        const container = document.getElementById('dynamic-blocks-container');
+        const emptyState = document.getElementById('empty-workspace-state');
+        if(container.children.length === 0) {
+            emptyState.style.display = 'block';
+            container.style.display = 'none';
+        } else {
+            emptyState.style.display = 'none';
+            container.style.display = 'flex';
+        }
+    }
+
+    function switchSettingGroup(groupId, el) {
+        document.querySelectorAll('.settings-nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.settings-group').forEach(grp => grp.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById(`sg-${groupId}`).classList.add('active');
+    }
+
+    function updateProviderHint() {
+        const provider = document.getElementById('llm-provider').value;
+        const input = document.getElementById('api-key-input');
+        const hint = document.getElementById('provider-hint');
+        if (provider === 'gemini') {
+            input.placeholder = "Leave blank to use built-in Canvas AI, or enter Gemini key...";
+            hint.innerText = "Leave blank to use the built-in Canvas Gemini model, or enter your own key.";
+        } else if (provider === 'openai') {
+            input.placeholder = "Enter OpenAI API key (sk-...)";
+            hint.innerText = "API key required for OpenAI.";
+        } else if (provider === 'anthropic') {
+            input.placeholder = "Enter Anthropic API key (sk-ant-...)";
+            hint.innerText = "API key required for Anthropic.";
+        }
+    }
+
+    // ============================================================================
+    // SETTINGS LIST LOGIC
+    // ============================================================================
+    
+    function populateGlobalLayoutInputs() {
+        document.getElementById('gl_headerLogoEn').value = GLOBAL_LAYOUT_CONFIG.headerLogoEn;
+        document.getElementById('gl_headerLogoAr').value = GLOBAL_LAYOUT_CONFIG.headerLogoAr;
+        document.getElementById('gl_footerEn').value = GLOBAL_LAYOUT_CONFIG.footerEn;
+        document.getElementById('gl_footerAr').value = GLOBAL_LAYOUT_CONFIG.footerAr;
+        document.getElementById('gl_legalEn').value = GLOBAL_LAYOUT_CONFIG.legalEn;
+        document.getElementById('gl_legalAr').value = GLOBAL_LAYOUT_CONFIG.legalAr;
+    }
+
+    function updateGlobalLayout() {
+        GLOBAL_LAYOUT_CONFIG.headerLogoEn = document.getElementById('gl_headerLogoEn').value;
+        GLOBAL_LAYOUT_CONFIG.headerLogoAr = document.getElementById('gl_headerLogoAr').value;
+        GLOBAL_LAYOUT_CONFIG.footerEn = document.getElementById('gl_footerEn').value;
+        GLOBAL_LAYOUT_CONFIG.footerAr = document.getElementById('gl_footerAr').value;
+        GLOBAL_LAYOUT_CONFIG.legalEn = document.getElementById('gl_legalEn').value;
+        GLOBAL_LAYOUT_CONFIG.legalAr = document.getElementById('gl_legalAr').value;
+        saveState();
+        updateTemplate();
+    }
+
+    function togglePanel(id) {
+        const panel = document.getElementById(`edit-panel-${id}`);
+        if (panel) {
+            panel.classList.toggle('active');
+            if (panel.classList.contains('active')) activeConfigPanels.add(id);
+            else activeConfigPanels.delete(id);
+        }
+    }
+
+    function getConfigArray(type) {
+        if (type === 'email_style') return EMAIL_STYLE_CONFIG;
+        if (type === 'email_tpl') return EMAIL_TPL_CONFIG;
+        return [];
+    }
+
+    function renderAllConfigs() {
+        renderConfigList('email-style-list', EMAIL_STYLE_CONFIG, 'email_style');
+        renderBlocksConfig();
+        renderConfigList('email-tpl-list', EMAIL_TPL_CONFIG, 'email_tpl');
+        syncDropdowns();
+        updateBuilderDropdowns();
+    }
+
+    function updateBuilderDropdowns() {
+        let html = '';
+        BLOCKS_CONFIG.forEach(cb => { html += `<option value="${cb.id}">${cb.label}</option>`; });
+        
+        document.querySelectorAll('.tpl-block-selector').forEach(sel => {
+            const currentVal = sel.value;
+            sel.innerHTML = html;
+            if (Array.from(sel.options).some(o => o.value === currentVal)) sel.value = currentVal;
+        });
+
+        const sidebarList = document.getElementById('sidebar-add-block-list');
+        if (sidebarList) {
+            sidebarList.innerHTML = '';
+            BLOCKS_CONFIG.forEach(cb => {
+                const el = document.createElement('div');
+                el.className = 'sidebar-draggable-block';
+                el.draggable = true;
+                el.dataset.type = cb.id;
+                el.innerHTML = `
+                    <span style="color:var(--text-muted); display:flex; align-items:center;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </span>
+                    <span>${cb.label}</span>
+                `;
+                el.addEventListener('dragstart', handleDragStart);
+                el.addEventListener('dragend', handleDragEnd);
+                sidebarList.appendChild(el);
+            });
+        }
+    }
+
+    function syncDropdowns() {
+        const emSelect = document.getElementById('email-type');
+        const currentEm = emSelect.value;
+        emSelect.innerHTML = '';
+        EMAIL_TPL_CONFIG.forEach(t => emSelect.appendChild(new Option(t.label, t.id)));
+        if (EMAIL_TPL_CONFIG.some(t => t.id === currentEm)) emSelect.value = currentEm;
+    }
+
+    function getBlockLabel(type) {
+        const conf = BLOCKS_CONFIG.find(c => c.id === type);
+        return conf ? conf.label : type;
+    }
+
+    function renderBlocksConfig() {
+        const list = document.getElementById('blocks-config-list');
+        list.innerHTML = '';
+        BLOCKS_CONFIG.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'order-item';
+            li.draggable = true;
+            li.dataset.id = item.id;
+            li.addEventListener('dragstart', handleDragStart);
+            li.addEventListener('dragover', handleDragOver);
+            li.addEventListener('dragenter', handleDragEnter);
+            li.addEventListener('dragleave', handleDragLeave);
+            li.addEventListener('drop', handleDrop);
+            li.addEventListener('dragend', handleDragEnd);
+
+            const isActive = activeConfigPanels.has(item.id) ? 'active' : '';
+
+            li.innerHTML = `
+                <div class="engine-header">
+                    <span style="color:var(--text-muted); cursor:grab; padding-right:5px; font-size:16px;">≡</span>
+                    <span id="label-${item.id}" style="font-weight:600; font-size:14px; color: var(--text-main);">${item.label}</span>
+                    <span style="font-size:10px; padding: 2px 6px; background: var(--bg-hover); border-radius: 4px; margin-left: 8px; color: var(--text-secondary); border: 1px solid var(--border-color);">${item.inputType}</span>
+                    <div class="engine-actions">
+                        <button type="button" onclick="togglePanel('${item.id}')">✏️ Edit</button>
+                        <button type="button" onclick="deleteBlockConfig('${item.id}')" style="color:var(--text-danger); border-color:rgba(220,38,38,0.2);">🗑️</button>
+                    </div>
+                </div>
+                <div class="engine-prompt-edit ${isActive}" id="edit-panel-${item.id}">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div>
+                            <label style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Block Name</label>
+                            <input type="text" value="${item.label}" oninput="updateBlockConfigName('${item.id}', this.value)">
+                        </div>
+                        <div>
+                            <label style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Input Type</label>
+                            <select onchange="updateBlockConfigInputType('${item.id}', this.value)" style="width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-panel); color: var(--text-main); outline: none;">
+                                <option value="text" ${item.inputType === 'text' ? 'selected' : ''}>Single Line Text</option>
+                                <option value="title_subtitle" ${item.inputType === 'title_subtitle' ? 'selected' : ''}>Title & Subtitle</option>
+                                <option value="richtext" ${item.inputType === 'richtext' ? 'selected' : ''}>Rich Text Editor</option>
+                                <option value="list" ${item.inputType === 'list' ? 'selected' : ''}>List / Repeating Rows (Table)</option>
+                                <option value="image" ${item.inputType === 'image' ? 'selected' : ''}>Image (URL + Alt)</option>
+                                <option value="button" ${item.inputType === 'button' ? 'selected' : ''}>Button (Text + URL)</option>
+                                <option value="divider" ${item.inputType === 'divider' ? 'selected' : ''}>Divider (No Input)</option>
+                                <option value="table" ${item.inputType === 'table' ? 'selected' : ''}>Data Table</option>
+                                <option value="custom_html" ${item.inputType === 'custom_html' ? 'selected' : ''}>Custom HTML Block</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">HTML Wrapper Template</label>
+                        <p style="font-size:11px; color:var(--text-muted); margin-bottom:6px;">Use <code>{{content}}</code> (main input), <code>{{meta}}</code> (Alt/URL/Subtext), <code>{{items}}</code> (for List), and <code>{{align}}</code>.</p>
+                        <textarea oninput="updateBlockConfigHtml('${item.id}', this.value)" style="font-family:monospace; white-space:pre; min-height:80px; margin-bottom:10px;">${item.html}</textarea>
+                        
+                        <div style="${item.inputType === 'list' ? 'display:block;' : 'display:none;'} margin-bottom:10px;">
+                            <label style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Row/Item HTML Template</label>
+                            <p style="font-size:11px; color:var(--text-muted); margin-bottom:6px;">Use <code>{{item_title}}</code>, <code>{{item_desc}}</code>, <code>{{item_index}}</code>, and <code>{{item_link_html}}</code> to map row inputs.</p>
+                            <textarea oninput="updateBlockConfigItemHtml('${item.id}', this.value)" style="font-family:monospace; white-space:pre; min-height:80px;">${item.itemHtml || ''}</textarea>
+                        </div>
+
+                        <label style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Default Content Pre-fill (Optional)</label>
+                        <p style="font-size:11px; color:var(--text-muted); margin-bottom:6px;">For simple blocks use plain HTML. For 'list' blocks, use valid JSON like: <code>[{"title":"...", "desc":"..."}]</code></p>
+                        <textarea oninput="updateBlockConfigDefaultContent('${item.id}', this.value)" style="font-family:monospace; white-space:pre; min-height:80px;">${item.defaultContent || ''}</textarea>
+                    </div>
+                </div>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    function updateBlockConfigName(id, value) {
+        const item = BLOCKS_CONFIG.find(i => i.id === id);
+        if (item) { item.label = value; document.getElementById(`label-${id}`).innerText = value; updateBuilderDropdowns(); saveState(); }
+    }
+    function updateBlockConfigInputType(id, value) {
+        const item = BLOCKS_CONFIG.find(i => i.id === id);
+        if (item) { item.inputType = value; saveState(); renderBlocksConfig(); }
+    }
+    function updateBlockConfigHtml(id, value) {
+        const item = BLOCKS_CONFIG.find(i => i.id === id);
+        if (item) { item.html = value; saveState(); updateTemplate(); } 
+    }
+    function updateBlockConfigItemHtml(id, value) {
+        const item = BLOCKS_CONFIG.find(i => i.id === id);
+        if (item) { item.itemHtml = value; saveState(); updateTemplate(); } 
+    }
+    function updateBlockConfigDefaultContent(id, value) {
+        const item = BLOCKS_CONFIG.find(i => i.id === id);
+        if (item) { item.defaultContent = value; saveState(); } 
+    }
+    function deleteBlockConfig(id) {
+        if (confirm("Are you sure you want to delete this block type? It will break templates currently using it.")) {
+            const index = BLOCKS_CONFIG.findIndex(i => i.id === id);
+            if (index > -1) BLOCKS_CONFIG.splice(index, 1);
+            activeConfigPanels.delete(id);
+            renderAllConfigs(); saveState(); showToast("Block deleted.", "success");
+        }
+    }
+    function addNewBlockConfig() {
+        const id = 'blk_' + Date.now();
+        BLOCKS_CONFIG.push({ id: id, label: "New Custom Block", inputType: 'richtext', html: '<div style="text-align:{{align}};">{{content}}</div>' });
+        activeConfigPanels.add(id);
+        renderAllConfigs(); saveState(); showToast("New Block created.", "success");
+    }
+
+    function renderConfigList(listId, configArray, listType) {
+        const list = document.getElementById(listId);
+        list.innerHTML = '';
+        configArray.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'order-item';
+            li.draggable = true;
+            li.dataset.id = item.id;
+            li.addEventListener('dragstart', handleDragStart);
+            li.addEventListener('dragover', handleDragOver);
+            li.addEventListener('dragenter', handleDragEnter);
+            li.addEventListener('dragleave', handleDragLeave);
+            li.addEventListener('drop', handleDrop);
+            li.addEventListener('dragend', handleDragEnd);
+            
+            const isActive = activeConfigPanels.has(item.id) ? 'active' : '';
+
+            li.innerHTML = `
+                <div class="engine-header">
+                    <span style="color:var(--text-muted); cursor:grab; padding-right:5px; font-size:16px;">≡</span>
+                    <span id="label-${item.id}" style="font-weight:600; font-size:14px; color: var(--text-main);">${item.label}</span>
+                    <div class="engine-actions">
+                        <button type="button" onclick="togglePanel('${item.id}')">✏️ Edit</button>
+                        <button type="button" onclick="deleteConfigItem('${listType}', '${item.id}')" style="color:var(--text-danger); border-color:rgba(220,38,38,0.2);">🗑️</button>
+                    </div>
+                </div>
+                <div class="engine-prompt-edit ${isActive}" id="edit-panel-${item.id}">
+                    <div style="margin-bottom: 10px;">
+                        <label style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Title / Name</label>
+                        <input type="text" value="${item.label}" oninput="updateConfigName('${listType}', '${item.id}', this.value)" style="width: 100%;">
+                    </div>
+                    
+                    ${listType === 'email_tpl' ? `
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Block Sequence</label>
+                        
+                        <ul class="sortable-block-list" id="tpl-blocks-${item.id}">
+                            ${(item.blocks || []).map((b, idx) => `
+                                <li class="sortable-block-item" draggable="true" data-type="${b}" data-idx="${idx}" data-tplid="${item.id}">
+                                    <span class="grab-handle">=</span>
+                                    <span style="font-size:13px; font-weight:500;">${getBlockLabel(b)}</span>
+                                    <span style="margin-left:auto; color:var(--text-danger); cursor:pointer; font-weight:bold; padding:0 5px;" onclick="removeBlockFromTemplate('${item.id}', ${idx})" title="Remove block">×</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+
+                        <div style="display: flex; gap: 5px; margin-top: 8px;">
+                            <select id="add-block-sel-${item.id}" class="tpl-block-selector" style="padding: 8px 12px; font-size: 13px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-panel); color: var(--text-main); outline: none;">
+                                </select>
+                            <button type="button" class="run-btn secondary" style="padding: 8px 12px; font-size: 12px; width: auto;" onclick="addBlockToTemplate('${item.id}')">+ Add Block</button>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <div>
+                        <label style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Content / Instructions</label>
+                        <textarea oninput="updateConfigContent('${listType}', '${item.id}', this.value)" placeholder="Enter content...">${item.content}</textarea>
+                    </div>
+                </div>
+            `;
+            list.appendChild(li);
+
+            if (listType === 'email_tpl') {
+                const subList = document.getElementById(`tpl-blocks-${item.id}`);
+                if (subList) {
+                    Array.from(subList.children).forEach(subLi => {
+                        subLi.addEventListener('dragstart', handleDragStart);
+                        subLi.addEventListener('dragover', handleDragOver);
+                        subLi.addEventListener('dragenter', handleDragEnter);
+                        subLi.addEventListener('dragleave', handleDragLeave);
+                        subLi.addEventListener('drop', handleDrop);
+                        subLi.addEventListener('dragend', handleDragEnd);
+                    });
+                }
+            }
+        });
+    }
+
+    function addBlockToTemplate(id) {
+        const arr = getConfigArray('email_tpl');
+        const item = arr.find(i => i.id === id);
+        const sel = document.getElementById(`add-block-sel-${id}`);
+        if(item && sel) {
+            if(!item.blocks) item.blocks = [];
+            item.blocks.push(sel.value);
+            saveState();
+            renderAllConfigs(); 
+        }
+    }
+
+    function removeBlockFromTemplate(id, index) {
+        const arr = getConfigArray('email_tpl');
+        const item = arr.find(i => i.id === id);
+        if(item && item.blocks) {
+            item.blocks.splice(index, 1);
+            saveState();
+            renderAllConfigs();
+        }
+    }
+
+    function updateConfigName(type, id, value) {
+        const arr = getConfigArray(type);
+        const item = arr.find(i => i.id === id);
+        if (item) { item.label = value; document.getElementById(`label-${id}`).innerText = value; if (type.includes('tpl')) syncDropdowns(); saveState(); }
+    }
+    
+    function updateConfigContent(type, id, value) {
+        const arr = getConfigArray(type);
+        const item = arr.find(i => i.id === id);
+        if (item) { item.content = value; saveState(); }
+    }
+
+    function deleteConfigItem(type, id) {
+        if (confirm("Are you sure you want to delete this item?")) {
+            let arr = getConfigArray(type); const index = arr.findIndex(i => i.id === id);
+            if (index > -1) arr.splice(index, 1);
+            activeConfigPanels.delete(id);
+            renderAllConfigs(); saveState(); showToast("Item deleted.", "success");
+        }
+    }
+
+    function addNewConfigItem(type) {
+        let arr = getConfigArray(type); const id = type + '_' + Date.now();
+        arr.push({ id: id, label: "New Item", content: "Enter details here...", blocks: type === 'email_tpl' ? ['title', 'text'] : undefined });
+        activeConfigPanels.add(id);
+        renderAllConfigs(); saveState(); showToast("New item added.", "success");
+    }
+
+    function renderSettingsEngines() {
+        const list = document.getElementById('engine-order-list');
+        list.innerHTML = '';
+        ENGINE_CONFIG.forEach(eng => {
+            const li = document.createElement('li');
+            li.className = 'order-item'; li.draggable = true; li.dataset.id = eng.id;
+            li.addEventListener('dragstart', handleDragStart); li.addEventListener('dragover', handleDragOver);
+            li.addEventListener('dragenter', handleDragEnter); li.addEventListener('dragleave', handleDragLeave);
+            li.addEventListener('drop', handleDrop); li.addEventListener('dragend', handleDragEnd);
+            
+            const isActive = activeConfigPanels.has(eng.id) ? 'active' : '';
+
+            li.innerHTML = `
+                <div class="engine-header">
+                    <span style="color:var(--text-muted); cursor:grab; padding-right:5px; font-size:16px;">≡</span>
+                    <span id="label-${eng.id}" style="font-weight:600; font-size:14px; color: var(--text-main);">${eng.label}</span>
+                    <div class="engine-actions">
+                        <label title="Enable Engine"><input type="checkbox" ${eng.isActive ? 'checked' : ''} onchange="toggleEngineContext('${eng.id}', this.checked)"> Active</label>
+                        <button type="button" onclick="togglePanel('${eng.id}')">✏️ Edit</button>
+                        <button type="button" onclick="deleteEngine('${eng.id}')" style="color:var(--text-danger); border-color:rgba(220,38,38,0.2);">🗑️</button>
+                    </div>
+                </div>
+                <div class="engine-prompt-edit ${isActive}" id="edit-panel-${eng.id}">
+                    <div style="margin-bottom: 10px;">
+                        <label style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Engine Name</label>
+                        <input type="text" value="${eng.label}" oninput="updateEngineName('${eng.id}', this.value)" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label style="font-size:11px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; display:block; margin-bottom:4px;">Prompt Instructions</label>
+                        <textarea oninput="updateEnginePrompt('${eng.id}', this.value)" placeholder="Enter evaluation instructions...">${eng.prompt}</textarea>
+                    </div>
+                </div>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    function toggleEngineContext(id, isChecked) {
+        const eng = ENGINE_CONFIG.find(e => e.id === id);
+        if (eng) { eng.isActive = isChecked; saveState(); }
+    }
+    function updateEngineName(id, value) {
+        const eng = ENGINE_CONFIG.find(e => e.id === id);
+        if (eng) { eng.label = value; document.getElementById(`label-${id}`).innerText = value; saveState(); }
+    }
+    function updateEnginePrompt(id, value) {
+        const eng = ENGINE_CONFIG.find(e => e.id === id);
+        if (eng) { eng.prompt = value; saveState(); }
+    }
+    function deleteEngine(id) {
+        if (confirm("Are you sure you want to delete this evaluation engine?")) {
+            ENGINE_CONFIG = ENGINE_CONFIG.filter(e => e.id !== id);
+            activeConfigPanels.delete(id);
+            renderSettingsEngines(); saveState(); showToast("Engine deleted.", "success");
+        }
+    }
+    function addNewEngine() {
+        const id = 'eng_' + Date.now();
+        ENGINE_CONFIG.push({ id: id, label: "New Engine", prompt: 'Enter prompt instructions here...', isActive: true });
+        activeConfigPanels.add(id);
+        renderSettingsEngines(); saveState(); showToast("New engine added.", "success");
+    }
+
+    // --- GENERIC DRAG AND DROP HANDLER ---
+    function handleDragStart(e) { dragSourceEl = this; e.dataTransfer.effectAllowed = 'move'; this.classList.add('dragging'); }
+    function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); return false; }
+    function handleDragEnter() { this.classList.add('over'); }
+    function handleDragLeave() { this.classList.remove('over'); }
+    
+    function handleDrop(e) {
+        if (e.stopPropagation) e.stopPropagation();
+        if (!dragSourceEl) return false;
+
+        if (dragSourceEl.classList.contains('sidebar-draggable-block')) {
+            return false;
+        }
+
+        if (dragSourceEl !== this) {
+            const list = this.parentNode;
+            if (dragSourceEl.parentNode !== list) return false; 
+            
+            const sourceIndex = Array.from(list.children).indexOf(dragSourceEl);
+            const targetIndex = Array.from(list.children).indexOf(this);
+            list.insertBefore(dragSourceEl, sourceIndex < targetIndex ? this.nextSibling : this);
+            
+            if (list.classList.contains('sortable-block-list')) {
+                const tplId = dragSourceEl.dataset.tplid;
+                const arr = getConfigArray('email_tpl');
+                const tpl = arr.find(i => i.id === tplId);
+                if (tpl) {
+                    tpl.blocks = Array.from(list.children).map(li => li.dataset.type);
+                    saveState();
+                }
+            } else if (list.id === 'blocks-config-list') {
+                const currentOrderIds = Array.from(list.children).map(li => li.dataset.id);
+                BLOCKS_CONFIG.sort((a, b) => currentOrderIds.indexOf(a.id) - currentOrderIds.indexOf(b.id));
+                renderAllConfigs(); 
+                saveState();
+            } else {
+                const currentOrderIds = Array.from(list.children).map(li => li.dataset.id);
+                if (list.id === 'engine-order-list') ENGINE_CONFIG.sort((a, b) => currentOrderIds.indexOf(a.id) - currentOrderIds.indexOf(b.id));
+                else if (list.id === 'email-style-list') EMAIL_STYLE_CONFIG.sort((a, b) => currentOrderIds.indexOf(a.id) - currentOrderIds.indexOf(b.id));
+                else if (list.id === 'email-tpl-list') { EMAIL_TPL_CONFIG.sort((a, b) => currentOrderIds.indexOf(a.id) - currentOrderIds.indexOf(b.id)); syncDropdowns(); }
+                saveState();
+            }
+        }
+        return false;
+    }
+
+    function handleEmailBlockDrop(e) {
+        if (e.stopPropagation) e.stopPropagation();
+        if (!dragSourceEl) return false;
+
+        if (dragSourceEl.classList.contains('sidebar-draggable-block')) {
+            addEmailBlock(dragSourceEl.dataset.type, null, this);
+        } else if (dragSourceEl.classList.contains('email-block') && dragSourceEl !== this) {
+            const list = this.parentNode;
+            if (dragSourceEl.parentNode !== list) return false;
+            const sourceIndex = Array.from(list.children).indexOf(dragSourceEl);
+            const targetIndex = Array.from(list.children).indexOf(this);
+            list.insertBefore(dragSourceEl, sourceIndex < targetIndex ? this.nextSibling : this);
+            updateTemplate();
+        }
+        return false;
+    }
+
+    function handleDragEnd() {
+        this.classList.remove('dragging');
+        document.querySelectorAll('.order-item, .email-block, .sortable-block-item').forEach(i => i.classList.remove('over'));
+    }
+
+    // ============================================================================
+    // MODULAR EMAIL BUILDER LOGIC
+    // ============================================================================
+
+    function getBlocksData() {
+        const data = [];
+        document.querySelectorAll('#dynamic-blocks-container .email-block').forEach(el => {
+            const id = el.dataset.id;
+            const type = el.dataset.type;
+            
+            let enVal = "", arVal = "", enMeta = "", arMeta = "";
+            const enInput = document.getElementById(`in_${id}_en`);
+            const arInput = document.getElementById(`in_${id}_ar`);
+            const enMetaInput = document.getElementById(`in_${id}_en_meta`);
+            const arMetaInput = document.getElementById(`in_${id}_ar_meta`);
+
+            const enList = document.getElementById(`list_${id}_en`);
+            const arList = document.getElementById(`list_${id}_ar`);
+            
+            if (enList) {
+                const items = Array.from(enList.querySelectorAll('.list-item-row')).map(row => ({
+                    title: row.querySelector('.item-title').value,
+                    desc: row.querySelector('.item-desc').value,
+                    linkText: row.querySelector('.item-link-text') ? row.querySelector('.item-link-text').value : '',
+                    linkUrl: row.querySelector('.item-link-url') ? row.querySelector('.item-link-url').value : ''
+                }));
+                enVal = JSON.stringify(items);
+            } else if (enInput) {
+                enVal = enInput.tagName === 'DIV' ? enInput.innerHTML : enInput.value;
+            }
+
+            if (arList) {
+                const items = Array.from(arList.querySelectorAll('.list-item-row')).map(row => ({
+                    title: row.querySelector('.item-title').value,
+                    desc: row.querySelector('.item-desc').value,
+                    linkText: row.querySelector('.item-link-text') ? row.querySelector('.item-link-text').value : '',
+                    linkUrl: row.querySelector('.item-link-url') ? row.querySelector('.item-link-url').value : ''
+                }));
+                arVal = JSON.stringify(items);
+            } else if (arInput) {
+                arVal = arInput.tagName === 'DIV' ? arInput.innerHTML : arInput.value;
+            }
+
+            if (enMetaInput) enMeta = enMetaInput.value;
+            if (arMetaInput) arMeta = arMetaInput.value;
+            
+            data.push({ id, type, en: enVal, ar: arVal, enMeta, arMeta });
+        });
+        return data;
+    }
+
+    function autoSaveDrafts() {
+        const drafts = { 
+            blocks: getBlocksData(),
+            globalAlign: document.getElementById('global-align').value
+        };
+        localStorage.setItem('email_content_hub_drafts', JSON.stringify(drafts));
+    }
+
+    function loadDrafts() {
+        const stored = localStorage.getItem('email_content_hub_drafts');
+        const container = document.getElementById('dynamic-blocks-container');
+        container.innerHTML = '';
+        
+        if (stored) {
+            try {
+                const drafts = JSON.parse(stored);
+                if (drafts.globalAlign) document.getElementById('global-align').value = drafts.globalAlign;
+
+                if(drafts.blocks && drafts.blocks.length > 0) {
+                    drafts.blocks.forEach(b => addEmailBlock(b.type, b));
+                }
+            } catch(e) { /* ignore load errors */ }
+        }
+        updateTemplate();
+        checkEmptyWorkspace();
+    }
+
+    function loadTemplateBlocks(skipPrompt = false) {
+        const tplId = document.getElementById('email-type').value;
+        const tpl = EMAIL_TPL_CONFIG.find(t => t.id === tplId);
+        
+        if (!tpl || !tpl.blocks || tpl.blocks.length === 0) {
+            if(!skipPrompt) showToast("No blocks sequence predefined for this template in Settings.", "error");
+            return;
+        }
+
+        const container = document.getElementById('dynamic-blocks-container');
+        if (!skipPrompt && container.children.length > 0) {
+            if(!confirm("Loading this template will replace your current email blocks. Continue?")) return;
+        }
+        
+        container.innerHTML = '';
+        tpl.blocks.forEach(bType => { addEmailBlock(bType, { isTemplate: true }); });
+        
+        updateTemplate();
+        checkEmptyWorkspace();
+        if(!skipPrompt) showToast("Template blocks loaded!", "success");
+    }
+
+    function generateId() {
+        return 'blk_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function renderListEditor(blockId, lang, valStr) {
+        let items = [];
+        try { items = JSON.parse(valStr); } catch(e){}
+        if(!Array.isArray(items) || items.length === 0) items = [{title: '', desc: '', linkText: '', linkUrl: ''}];
+        
+        let rowsHtml = items.map((item) => `
+            <div class="list-item-row" style="display:flex; gap:10px; margin-bottom:10px; align-items:flex-start; border-bottom:1px dashed var(--border-color); padding-bottom:10px;">
+                <div style="flex:1;">
+                    <input type="text" class="item-title" value="${(item.title||'').replace(/"/g, '&quot;')}" placeholder="Title" oninput="updateTemplate()" style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); margin-bottom:6px; font-weight:700; font-size:13px; background: var(--bg-hover);" ${lang === 'ar' ? 'dir="rtl"' : ''}>
+                    <textarea class="item-desc" placeholder="Description" oninput="updateTemplate()" style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:13px; resize:vertical; min-height:40px; margin-bottom:6px; background: var(--bg-hover);" ${lang === 'ar' ? 'dir="rtl"' : ''}>${item.desc||''}</textarea>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" class="item-link-text" value="${(item.linkText||'').replace(/"/g, '&quot;')}" placeholder="Link Text (e.g. Here →)" oninput="updateTemplate()" style="width:40%; padding:8px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:12px; background: var(--bg-hover);" ${lang === 'ar' ? 'dir="rtl"' : ''}>
+                        <input type="text" class="item-link-url" value="${(item.linkUrl||'').replace(/"/g, '&quot;')}" placeholder="Link URL" oninput="updateTemplate()" style="width:60%; padding:8px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:12px; background: var(--bg-hover);" ${lang === 'ar' ? 'dir="rtl"' : ''}>
+                    </div>
+                </div>
+                <button type="button" onclick="this.parentElement.remove(); updateTemplate(); checkEmptyWorkspace();" style="padding:6px; background:transparent; color:var(--text-danger); border:1px solid rgba(220,38,38,0.2); border-radius:var(--radius-sm); cursor:pointer;" title="Remove Row">🗑️</button>
+            </div>
+        `).join('');
+
+        return `
+            <div id="list_${blockId}_${lang}" class="list-editor-container" style="background:transparent; padding:0; border-radius:var(--radius-md);">
+                <div class="list-rows">${rowsHtml}</div>
+                <button type="button" class="run-btn secondary" style="padding:8px 16px; font-size:12px; margin-top:5px; width:auto;" onclick="addListItem('${blockId}', '${lang}')">+ Add Row</button>
+            </div>
+        `;
+    }
+
+    window.addListItem = function(blockId, lang) {
+        const container = document.querySelector(`#list_${blockId}_${lang} .list-rows`);
+        if(!container) return;
+        const row = document.createElement('div');
+        row.className = 'list-item-row';
+        row.style.cssText = "display:flex; gap:10px; margin-bottom:10px; align-items:flex-start; border-bottom:1px dashed var(--border-color); padding-bottom:10px;";
+        row.innerHTML = `
+            <div style="flex:1;">
+                <input type="text" class="item-title" placeholder="Title" oninput="updateTemplate()" style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); margin-bottom:6px; font-weight:700; font-size:13px; background: var(--bg-hover);" ${lang === 'ar' ? 'dir="rtl"' : ''}>
+                <textarea class="item-desc" placeholder="Description" oninput="updateTemplate()" style="width:100%; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:13px; resize:vertical; min-height:40px; margin-bottom:6px; background: var(--bg-hover);" ${lang === 'ar' ? 'dir="rtl"' : ''}></textarea>
+                <div style="display:flex; gap:6px;">
+                    <input type="text" class="item-link-text" placeholder="Link Text (e.g. Here →)" oninput="updateTemplate()" style="width:40%; padding:8px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:12px; background: var(--bg-hover);" ${lang === 'ar' ? 'dir="rtl"' : ''}>
+                    <input type="text" class="item-link-url" placeholder="Link URL" oninput="updateTemplate()" style="width:60%; padding:8px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:12px; background: var(--bg-hover);" ${lang === 'ar' ? 'dir="rtl"' : ''}>
+                </div>
+            </div>
+            <button type="button" onclick="this.parentElement.remove(); updateTemplate(); checkEmptyWorkspace();" style="padding:6px; background:transparent; color:var(--text-danger); border:1px solid rgba(220,38,38,0.2); border-radius:var(--radius-sm); cursor:pointer;" title="Remove Row">🗑️</button>
+        `;
+        container.appendChild(row);
+        updateTemplate();
+    };
+
+    // ============================================================================
+    // TABLE BLOCK EDITOR
+    // ============================================================================
+
+    function renderTableEditor(blockId, lang, valStr) {
+        let tableData = { headers: ['Column 1', 'Column 2'], rows: [['', ''], ['', '']] };
+        try { const parsed = JSON.parse(valStr); if (parsed && parsed.headers) tableData = parsed; } catch(e){}
+        const numCols = tableData.headers.length;
+
+        let headersHtml = tableData.headers.map((h, ci) => `
+            <th style="padding:4px; vertical-align:top; white-space:nowrap;">
+                <input type="text" class="table-header-cell" data-col="${ci}" value="${(h||'').replace(/"/g, '&quot;')}" placeholder="Header ${ci+1}"
+                    oninput="syncTableData('${blockId}','${lang}')"
+                    style="width:100%; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:12px; font-weight:700; background:var(--bg-hover); color:var(--text-main);" ${lang === 'ar' ? 'dir="rtl"' : ''}>
+            </th>`).join('');
+
+        let rowsHtml = tableData.rows.map((row, ri) => {
+            let cellsHtml = row.map((cell, ci) => `
+                <td style="padding:4px; vertical-align:top;">
+                    <input type="text" class="table-body-cell" data-row="${ri}" data-col="${ci}" value="${(cell||'').replace(/"/g, '&quot;')}" placeholder="Cell"
+                        oninput="syncTableData('${blockId}','${lang}')"
+                        style="width:100%; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:12px; background:var(--bg-hover); color:var(--text-main);" ${lang === 'ar' ? 'dir="rtl"' : ''}>
+                </td>`).join('');
+            return `<tr class="table-row-editor" data-row="${ri}">
+                ${cellsHtml}
+                <td style="padding:4px; width:26px; vertical-align:middle;">
+                    <button type="button" onclick="removeTableRow('${blockId}','${lang}',${ri})"
+                        style="padding:5px 7px; background:transparent; color:var(--text-danger); border:1px solid rgba(220,38,38,0.2); border-radius:var(--radius-sm); cursor:pointer; font-size:11px; line-height:1;" title="Remove Row">✕</button>
+                </td>
+            </tr>`;
+        }).join('');
+
+        return `
+            <div id="table_editor_${blockId}_${lang}" class="table-editor-container" style="padding:16px;">
+                <div style="overflow-x:auto; margin-bottom:8px;">
+                    <table style="border-collapse:collapse; width:100%;" class="table-edit-grid">
+                        <thead>
+                            <tr>
+                                ${headersHtml}
+                                <th style="padding:4px; width:26px; vertical-align:middle;">
+                                    <button type="button" onclick="addTableColumn('${blockId}','${lang}')"
+                                        style="padding:4px 7px; background:transparent; color:var(--text-success); border:1px solid rgba(22,163,74,0.3); border-radius:var(--radius-sm); cursor:pointer; font-size:10px; font-weight:700; white-space:nowrap;" title="Add Column">+col</button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button type="button" class="run-btn secondary" style="padding:7px 14px; font-size:12px; width:auto;" onclick="addTableRow('${blockId}','${lang}')">+ Add Row</button>
+                    <button type="button" class="run-btn secondary" style="padding:7px 14px; font-size:12px; width:auto; color:var(--text-danger);" onclick="removeTableColumn('${blockId}','${lang}')">− Remove Last Column</button>
+                </div>
+                <textarea id="in_${blockId}_${lang}" style="display:none;" oninput="updateTemplate()">${valStr}</textarea>
+            </div>`;
+    }
+
+    window.syncTableData = function(blockId, lang) {
+        const container = document.getElementById(`table_editor_${blockId}_${lang}`);
+        if (!container) return;
+        const grid = container.querySelector('.table-edit-grid');
+        if (!grid) return;
+        const headers = Array.from(grid.querySelectorAll('thead .table-header-cell')).map(i => i.value);
+        const rows = Array.from(grid.querySelectorAll('tbody .table-row-editor')).map(tr =>
+            Array.from(tr.querySelectorAll('.table-body-cell')).map(i => i.value)
+        );
+        const hidden = document.getElementById(`in_${blockId}_${lang}`);
+        if (hidden) hidden.value = JSON.stringify({ headers, rows });
+        updateTemplate();
+    };
+
+    window.addTableRow = function(blockId, lang) {
+        const container = document.getElementById(`table_editor_${blockId}_${lang}`);
+        if (!container) return;
+        const grid = container.querySelector('.table-edit-grid');
+        const numCols = grid.querySelectorAll('thead .table-header-cell').length;
+        const tbody = grid.querySelector('tbody');
+        const ri = tbody.querySelectorAll('.table-row-editor').length;
+        const tr = document.createElement('tr');
+        tr.className = 'table-row-editor';
+        tr.dataset.row = ri;
+        let cellsHtml = Array.from({length: numCols}, (_, ci) => `
+            <td style="padding:4px; vertical-align:top;">
+                <input type="text" class="table-body-cell" data-row="${ri}" data-col="${ci}" value="" placeholder="Cell"
+                    oninput="syncTableData('${blockId}','${lang}')"
+                    style="width:100%; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:12px; background:var(--bg-hover); color:var(--text-main);">
+            </td>`).join('');
+        tr.innerHTML = cellsHtml + `<td style="padding:4px; width:26px; vertical-align:middle;"><button type="button" onclick="removeTableRow('${blockId}','${lang}',${ri})" style="padding:5px 7px; background:transparent; color:var(--text-danger); border:1px solid rgba(220,38,38,0.2); border-radius:var(--radius-sm); cursor:pointer; font-size:11px; line-height:1;">✕</button></td>`;
+        tbody.appendChild(tr);
+        syncTableData(blockId, lang);
+    };
+
+    window.removeTableRow = function(blockId, lang, rowIndex) {
+        const container = document.getElementById(`table_editor_${blockId}_${lang}`);
+        if (!container) return;
+        const rows = container.querySelectorAll('.table-row-editor');
+        if (rows.length <= 1) { showToast("A table must have at least one row.", "error"); return; }
+        rows[rowIndex].remove();
+        syncTableData(blockId, lang);
+    };
+
+    window.addTableColumn = function(blockId, lang) {
+        const container = document.getElementById(`table_editor_${blockId}_${lang}`);
+        if (!container) return;
+        const grid = container.querySelector('.table-edit-grid');
+        const addColTh = grid.querySelector('thead tr th:last-child');
+        const numCols = grid.querySelectorAll('thead .table-header-cell').length;
+        const newTh = document.createElement('th');
+        newTh.style.cssText = 'padding:4px; vertical-align:top; white-space:nowrap;';
+        newTh.innerHTML = `<input type="text" class="table-header-cell" data-col="${numCols}" value="" placeholder="Header ${numCols+1}" oninput="syncTableData('${blockId}','${lang}')" style="width:100%; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:12px; font-weight:700; background:var(--bg-hover); color:var(--text-main);">`;
+        grid.querySelector('thead tr').insertBefore(newTh, addColTh);
+        grid.querySelectorAll('.table-row-editor').forEach((tr, ri) => {
+            const removeBtn = tr.querySelector('td:last-child');
+            const newTd = document.createElement('td');
+            newTd.style.cssText = 'padding:4px; vertical-align:top;';
+            newTd.innerHTML = `<input type="text" class="table-body-cell" data-row="${ri}" data-col="${numCols}" value="" placeholder="Cell" oninput="syncTableData('${blockId}','${lang}')" style="width:100%; min-width:80px; padding:8px 10px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:12px; background:var(--bg-hover); color:var(--text-main);">`;
+            tr.insertBefore(newTd, removeBtn);
+        });
+        syncTableData(blockId, lang);
+    };
+
+    window.removeTableColumn = function(blockId, lang) {
+        const container = document.getElementById(`table_editor_${blockId}_${lang}`);
+        if (!container) return;
+        const grid = container.querySelector('.table-edit-grid');
+        const headers = grid.querySelectorAll('thead .table-header-cell');
+        if (headers.length <= 1) { showToast("A table must have at least one column.", "error"); return; }
+        headers[headers.length - 1].closest('th').remove();
+        grid.querySelectorAll('.table-row-editor').forEach(tr => {
+            const cells = tr.querySelectorAll('.table-body-cell');
+            if (cells.length > 0) cells[cells.length - 1].closest('td').remove();
+        });
+        syncTableData(blockId, lang);
+    };
+
+    function addEmailBlock(type, data = null, targetSibling = null) {
+        const id = data && data.id ? data.id : generateId();
+
+        const conf = BLOCKS_CONFIG.find(c => c.id === type);
+        if (!conf) return; 
+
+        const defaultEn = conf.defaultContent || '';
+        const defaultAr = conf.defaultContentAr || conf.defaultContent || '';
+
+        const enVal = data && data.en !== undefined ? data.en : defaultEn;
+        const arVal = data && data.ar !== undefined ? data.ar : defaultAr;
+        const enMeta = data && data.enMeta !== undefined ? data.enMeta : (conf.defaultMeta || '');
+        const arMeta = data && data.arMeta !== undefined ? data.arMeta : (conf.defaultMetaAr || conf.defaultMeta || '');
+
+        let blockTitle = conf.label;
+        let headerColorStyle = "";
+
+        let enInputHtml = '', arInputHtml = '';
+        let rtfButtonsEn = '', rtfButtonsAr = '';
+
+        if (conf.inputType === 'text') {
+            enInputHtml = `<input type="text" id="in_${id}_en" placeholder="Enter English Text..." value="${enVal.replace(/"/g, '&quot;')}" oninput="updateTemplate()">`;
+            arInputHtml = `<input type="text" id="in_${id}_ar" placeholder="أدخل النص العربي..." value="${arVal.replace(/"/g, '&quot;')}" oninput="updateTemplate()">`;
+        } else if (conf.inputType === 'title_subtitle') {
+            enInputHtml = `
+                <input type="text" id="in_${id}_en" placeholder="Main Title (e.g., Grand Sale)" value="${enVal.replace(/"/g, '&quot;')}" oninput="updateTemplate()" style="margin-bottom:8px; font-weight:700;">
+                <input type="text" id="in_${id}_en_meta" placeholder="Subtitle (optional)" value="${enMeta.replace(/"/g, '&quot;')}" oninput="updateTemplate()">
+            `;
+            arInputHtml = `
+                <input type="text" id="in_${id}_ar" placeholder="العنوان الرئيسي..." value="${arVal.replace(/"/g, '&quot;')}" oninput="updateTemplate()" style="margin-bottom:8px; font-weight:700;" dir="rtl">
+                <input type="text" id="in_${id}_ar_meta" placeholder="العنوان الفرعي (اختياري)" value="${arMeta.replace(/"/g, '&quot;')}" oninput="updateTemplate()" dir="rtl">
+            `;
+        } else if (conf.inputType === 'richtext') {
+            enInputHtml = `<div id="in_${id}_en" class="rich-text-editor" contenteditable="true" placeholder="Enter English content..." oninput="updateTemplate()">${enVal}</div>`;
+            arInputHtml = `<div id="in_${id}_ar" class="rich-text-editor" contenteditable="true" placeholder="أدخل المحتوى العربي..." oninput="updateTemplate()">${arVal}</div>`;
+            rtfButtonsEn = `
+                <button type="button" onmousedown="event.preventDefault(); document.execCommand('bold', false, null); updateTemplate();" title="Bold"><b>B</b></button>
+                <button type="button" onmousedown="event.preventDefault(); document.execCommand('formatBlock', false, 'H3'); updateTemplate();" title="Subtitle"><b>H</b></button>
+                <button type="button" onmousedown="event.preventDefault(); document.execCommand('insertUnorderedList', false, null); updateTemplate();" title="Bulleted List">≡</button>
+                <button type="button" onmousedown="event.preventDefault(); insertLink();" title="Insert Link">🔗</button>
+            `;
+            rtfButtonsAr = rtfButtonsEn; 
+        } else if (conf.inputType === 'list') {
+            enInputHtml = `
+                <input type="text" id="in_${id}_en_meta" placeholder="List Header (Optional)" value="${enMeta.replace(/"/g, '&quot;')}" oninput="updateTemplate()" style="margin-bottom:12px; font-weight:700; font-size:14px; width:100%; border:1px solid var(--border-color); padding:10px 12px; border-radius:var(--radius-sm); background: var(--bg-hover);">
+                ${renderListEditor(id, 'en', enVal)}
+            `;
+            arInputHtml = `
+                <input type="text" id="in_${id}_ar_meta" placeholder="عنوان القائمة (اختياري)" value="${arMeta.replace(/"/g, '&quot;')}" oninput="updateTemplate()" style="margin-bottom:12px; font-weight:700; font-size:14px; width:100%; border:1px solid var(--border-color); padding:10px 12px; border-radius:var(--radius-sm); background: var(--bg-hover);" dir="rtl">
+                ${renderListEditor(id, 'ar', arVal)}
+            `;
+        } else if (conf.inputType === 'image') {
+            enInputHtml = `
+                <input type="text" id="in_${id}_en" placeholder="Image URL (e.g., https://...)" value="${enVal.replace(/"/g, '&quot;')}" oninput="updateTemplate()" style="margin-bottom:8px;">
+                <input type="text" id="in_${id}_en_meta" placeholder="Alt Text (optional)" value="${enMeta.replace(/"/g, '&quot;')}" oninput="updateTemplate()">
+            `;
+            arInputHtml = `
+                <input type="text" id="in_${id}_ar" placeholder="رابط الصورة..." value="${arVal.replace(/"/g, '&quot;')}" oninput="updateTemplate()" style="margin-bottom:8px;" dir="rtl">
+                <input type="text" id="in_${id}_ar_meta" placeholder="نص بديل (اختياري)" value="${arMeta.replace(/"/g, '&quot;')}" oninput="updateTemplate()" dir="rtl">
+            `;
+        } else if (conf.inputType === 'button') {
+            enInputHtml = `
+                <input type="text" id="in_${id}_en" placeholder="Button Text (e.g., Shop Now)" value="${enVal.replace(/"/g, '&quot;')}" oninput="updateTemplate()" style="margin-bottom:8px;">
+                <input type="url" id="in_${id}_en_meta" placeholder="Link URL (e.g., https://...)" value="${enMeta.replace(/"/g, '&quot;')}" oninput="updateTemplate()">
+            `;
+            arInputHtml = `
+                <input type="text" id="in_${id}_ar" placeholder="نص الزر..." value="${arVal.replace(/"/g, '&quot;')}" oninput="updateTemplate()" style="margin-bottom:8px;" dir="rtl">
+                <input type="url" id="in_${id}_ar_meta" placeholder="رابط الوجهة..." value="${arMeta.replace(/"/g, '&quot;')}" oninput="updateTemplate()" dir="rtl">
+            `;
+        } else if (conf.inputType === 'divider') {
+            enInputHtml = `<div style="padding:15px; text-align:center; color:var(--text-muted); background:var(--bg-hover); border-radius:4px; font-size:12px;">➖ Divider Line</div>`;
+            arInputHtml = `<div style="padding:15px; text-align:center; color:var(--text-muted); background:var(--bg-hover); border-radius:4px; font-size:12px;">➖ خط فاصل</div>`;
+        } else if (conf.inputType === 'table') {
+            enInputHtml = renderTableEditor(id, 'en', enVal || conf.defaultContent || '{"headers":["Column 1","Column 2"],"rows":[["",""]]}');
+            arInputHtml = renderTableEditor(id, 'ar', arVal || conf.defaultContentAr || conf.defaultContent || '{"headers":["العمود 1","العمود 2"],"rows":[["",""]]}');
+        } else if (conf.inputType === 'custom_html') {
+            enInputHtml = `<textarea id="in_${id}_en" placeholder="&lt;!-- Paste or write your custom HTML here... --&gt;" oninput="updateTemplate()" style="font-family:monospace; font-size:12px; line-height:1.6; min-height:160px; padding:16px; border:none; background:transparent; color:var(--text-main); width:100%; resize:vertical; outline:none; display:block;">${(enVal || conf.defaultContent || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>`;
+            arInputHtml = `<textarea id="in_${id}_ar" placeholder="&lt;!-- أدخل HTML المخصص هنا... --&gt;" oninput="updateTemplate()" dir="rtl" style="font-family:monospace; font-size:12px; line-height:1.6; min-height:160px; padding:16px; border:none; background:transparent; color:var(--text-main); width:100%; resize:vertical; outline:none; display:block;">${(arVal || conf.defaultContent || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>`;
+        }
+
+        const html = `
+            <div class="email-block-header" style="${headerColorStyle}" onclick="toggleBlockAccordion('${id}', event)">
+                <div style="display:flex; align-items:center; flex: 1; min-width: 0;">
+                    <span class="block-drag-handle" title="Drag to reorder" 
+                        onmousedown="this.closest('.email-block').setAttribute('draggable', 'true')" 
+                        onmouseup="this.closest('.email-block').setAttribute('draggable', 'false')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </span>
+                    <div style="display: flex; flex-direction: column; justify-content: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                        <span style="font-weight: 700; font-size: 13px; color: ${headerColorStyle ? 'inherit' : 'var(--text-main)'}; text-transform:uppercase; letter-spacing: 0.02em;">${blockTitle}</span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span class="block-type-badge ${conf.inputType}">${conf.inputType}</span>
+                    <button type="button" onclick="removeEmailBlock(this, event)" style="background:transparent; border:none; padding:4px; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center;" title="Remove Block">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+                    </button>
+                    <span class="block-toggle-icon">▼</span>
+                </div>
+            </div>
+            <div class="email-block-grid">
+                <div class="email-field-wrapper">
+                    ${rtfButtonsEn ? `<div class="toolbar">${rtfButtonsEn}</div>` : ''}
+                    ${enInputHtml}
+                </div>
+                <div class="email-field-wrapper" dir="rtl">
+                    ${rtfButtonsAr ? `<div class="toolbar" dir="ltr">${rtfButtonsAr}</div>` : ''}
+                    ${arInputHtml}
+                </div>
+            </div>
+        `;
+
+        const blockEl = document.createElement('div');
+        blockEl.className = 'email-block';
+        
+        // Accordions collapsed by default (removed classList.add('open'))
+        
+        blockEl.dataset.id = id;
+        blockEl.dataset.type = type;
+        
+        blockEl.draggable = false;
+        
+        blockEl.innerHTML = html;
+
+        blockEl.addEventListener('dragstart', handleDragStart);
+        blockEl.addEventListener('dragover', handleDragOver);
+        blockEl.addEventListener('dragenter', handleDragEnter);
+        blockEl.addEventListener('dragleave', handleDragLeave);
+        blockEl.addEventListener('drop', handleEmailBlockDrop);
+        blockEl.addEventListener('dragend', (e) => {
+            blockEl.setAttribute('draggable', 'false');
+            handleDragEnd.call(blockEl);
+        });
+
+        const container = document.getElementById('dynamic-blocks-container');
+        if (targetSibling && targetSibling.parentNode === container) {
+            container.insertBefore(blockEl, targetSibling);
+        } else {
+            container.appendChild(blockEl);
+        }
+        
+        setupEditorPasting(); 
+        if (!data) updateTemplate(); 
+        checkEmptyWorkspace();
+    }
+
+    function toggleBlockAccordion(id, e) {
+        if(e && (e.target.closest('button') || e.target.closest('.block-drag-handle') || e.target.tagName === 'INPUT')) return;
+        const block = document.querySelector(`.email-block[data-id="${id}"]`);
+        if(block) block.classList.toggle('open');
+    }
+
+    function removeEmailBlock(btn, e) {
+        if(e) e.stopPropagation();
+        const block = btn.closest('.email-block');
+        if (block) {
+            block.remove();
+            updateTemplate();
+            checkEmptyWorkspace();
+        }
+    }
+
+    function clearEmailFields() {
+        if(!confirm("Are you sure you want to remove all blocks?")) return;
+        document.getElementById('dynamic-blocks-container').innerHTML = '';
+        updateTemplate();
+        checkEmptyWorkspace();
+    }
+
+    // --- TEMPLATE GENERATION ENGINE ---
+
+    function setEmailPreviewMode(mode, el) {
+      emailPreviewMode = mode;
+      document.querySelectorAll('#view-preview .ptab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      updateTemplate();
+    }
+
+    function setDeviceMode(device) {
+      currentDevice = device;
+      document.getElementById('desktop_tab').className = `run-btn ${device === 'desktop' ? '' : 'secondary'}`;
+      document.getElementById('mobile_tab').className = `run-btn ${device === 'mobile' ? '' : 'secondary'}`;
+      
+      document.getElementById('desktop_tab').style.cssText = "padding: 6px 12px; font-size: 11px; width:auto;";
+      document.getElementById('mobile_tab').style.cssText = "padding: 6px 12px; font-size: 11px; width:auto;";
+
+      document.getElementById('emailPreviewArea').classList.toggle('mobile-frame', device === 'mobile');
+      updateTemplate();
+    }
+
+    function setupEditorPasting() {
+        document.querySelectorAll('.rich-text-editor').forEach(editor => {
+            editor.removeEventListener('paste', pasteCleaner);
+            editor.addEventListener('paste', pasteCleaner);
+        });
+    }
+
+    const pasteCleaner = function(e) {
+        e.preventDefault();
+        let paste = (e.clipboardData || window.clipboardData).getData('text/html');
+        if (!paste) {
+            paste = (e.clipboardData || window.clipboardData).getData('text/plain');
+            paste = paste.replace(/\n/g, '<br>');
+        } else {
+            const temp = document.createElement('div');
+            temp.innerHTML = paste;
+            temp.querySelectorAll('*').forEach(el => {
+                el.removeAttribute('style'); el.removeAttribute('class'); el.removeAttribute('id');
+            });
+            paste = temp.innerHTML;
+        }
+        document.execCommand('insertHTML', false, paste);
+        updateTemplate();
+    };
+
+    function execCmd(command, value = null) {
+        document.execCommand(command, false, value);
+        updateTemplate();
+    }
+
+    function insertLink() {
+        const url = prompt("Enter URL:");
+        if(url) execCmd('createLink', url);
+    }
+
+    // Applies RTL directional fixes to Arabic email HTML before preview rendering.
+    // Handles: accent border side, arrow direction, and asymmetric cell padding.
+    function rtlifyHtml(html) {
+        if (!html) return html;
+        return html
+            // Flip accent left border to right side (alert_danger, alert_info, alert_success, highlight_yellow)
+            .replace(/border-left:\s*(4px solid [^;"]+)/gi, 'border-right: $1')
+            // Flip right arrow to left arrow (next_steps)
+            .replace(/&#8594;/g, '&#8592;')
+            // next_steps — arrow cell padding: left-anchored → right-anchored
+            .replace(/padding: 16px 0 16px 16px/g, 'padding: 16px 16px 16px 0')
+            // next_steps — content cell padding
+            .replace(/padding: 16px 16px 16px 10px/g, 'padding: 16px 10px 16px 16px')
+            // numbered_steps — number cell padding
+            .replace(/padding: 12px 0 12px 16px/g, 'padding: 12px 16px 12px 0')
+            // numbered_steps + highlight_green — content cell padding
+            .replace(/padding: 12px 16px 12px 5px/g, 'padding: 12px 5px 12px 16px')
+            // highlight_green — plus icon cell padding
+            .replace(/padding: 12px 8px 12px 0/g, 'padding: 12px 0 12px 8px');
+    }
+
+    function generateRow(enVal, arVal, enAlign = "justify", arAlign = "justify") {
+      const paddingEn = "padding: 5px 20px 5px 15px;";
+      const paddingAr = "padding: 5px 15px 5px 20px;";
+      const baseStyleEn = `vertical-align: top; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; text-align: ${enAlign};`;
+      const baseStyleAr = `vertical-align: top; font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 22px; text-align: ${arAlign};`;
+
+      if (emailPreviewMode === 'bilingual') {
+        return `<tr><td width="50%" style="${paddingEn} ${baseStyleEn}">${enVal}</td><td width="50%" style="${paddingAr} ${baseStyleAr}" dir="rtl">${arVal}</td></tr>`;
+      } else if (emailPreviewMode === 'en') {
+        return `<tr><td style="padding: 5px 15px; ${baseStyleEn}">${enVal}</td></tr>`;
+      } else {
+        return `<tr><td style="padding: 5px 15px; ${baseStyleAr}" dir="rtl">${arVal}</td></tr>`;
+      }
+    }
+
+    function updateTemplate() {
+      autoSaveDrafts();
+      const blocksData = getBlocksData();
+      const globalAlign = document.getElementById('global-align').value;
+      document.getElementById('emailPreviewArea').innerHTML = buildEmailHTML(blocksData, emailPreviewMode, globalAlign);
+    }
+
+    function buildEmailHTML(blocksData, mode, globalAlign = "justify") {
+      const containerWidth = mode === 'bilingual' ? '1200px' : '600px';
+      let rowsHtml = "";
+      
+      const enAlign = globalAlign === 'side' ? 'left' : globalAlign;
+      const arAlign = globalAlign === 'side' ? 'right' : globalAlign;
+
+      blocksData.forEach((b) => {
+          const conf = BLOCKS_CONFIG.find(c => c.id === b.type);
+          if (!conf) return;
+
+          let enHtml = '', arHtml = '';
+
+          if (conf.inputType === 'divider') {
+              enHtml = conf.html; arHtml = conf.html;
+              rowsHtml += `<tr><td colspan="2" style="padding: 0 15px;">${enHtml}</td></tr>`;
+              return;
+          } else if (conf.inputType === 'list') {
+              let enItems = [], arItems = [];
+              try { enItems = JSON.parse(b.en); } catch(e){}
+              try { arItems = JSON.parse(b.ar); } catch(e){}
+              
+              let enItemsHtml = enItems.map((item, idx) => {
+                  let linkHtml = (item.linkUrl && item.linkText) ? `<td valign="middle" align="right" style="padding-left:10px;"><a href="${item.linkUrl}" style="color:#0000EE; text-decoration:none; font-weight:bold; font-size:14px; white-space:nowrap;">${item.linkText}</a></td>` : '';
+                  return (conf.itemHtml||'')
+                      .replace(/\{\{item_title\}\}/g, item.title || '')
+                      .replace(/\{\{item_desc\}\}/g, item.desc || '')
+                      .replace(/\{\{item_index\}\}/g, idx + 1)
+                      .replace(/\{\{item_link_html\}\}/g, linkHtml);
+              }).join('');
+
+              let arItemsHtml = arItems.map((item, idx) => {
+                  let linkHtml = (item.linkUrl && item.linkText) ? `<td valign="middle" align="left" style="padding-right:10px;" dir="rtl"><a href="${item.linkUrl}" style="color:#0000EE; text-decoration:none; font-weight:bold; font-size:14px; white-space:nowrap;">${item.linkText}</a></td>` : '';
+                  return (conf.itemHtml||'')
+                      .replace(/\{\{item_title\}\}/g, item.title || '')
+                      .replace(/\{\{item_desc\}\}/g, item.desc || '')
+                      .replace(/\{\{item_index\}\}/g, idx + 1)
+                      .replace(/\{\{item_link_html\}\}/g, linkHtml);
+              }).join('');
+
+              enHtml = enItemsHtml ? conf.html.replace(/\{\{items\}\}/g, enItemsHtml).replace(/\{\{align\}\}/g, enAlign).replace(/\{\{meta\}\}/g, b.enMeta || '') : '';
+              arHtml = arItemsHtml ? conf.html.replace(/\{\{items\}\}/g, arItemsHtml).replace(/\{\{align\}\}/g, arAlign).replace(/\{\{meta\}\}/g, b.arMeta || '') : '';
+          } else if (conf.inputType === 'table') {
+              const buildTableHtml = (jsonStr, align) => {
+                  let td;
+                  try { td = JSON.parse(jsonStr); } catch(e) { return ''; }
+                  if (!td || !td.headers || !td.rows) return '';
+                  const thHtml = td.headers.map(h =>
+                      `<th style="background-color:#f8f8f8; border:1px solid #e5e7eb; padding:10px 14px; text-align:${align}; font-weight:700; color:#1a1a1a; font-family:Helvetica,Arial,sans-serif; font-size:14px;">${h}</th>`
+                  ).join('');
+                  const tbodyHtml = td.rows.map((row, ri) => {
+                      const bg = ri % 2 === 0 ? '#ffffff' : '#fafafa';
+                      const tdHtml = row.map(cell =>
+                          `<td style="border:1px solid #e5e7eb; padding:10px 14px; color:#333333; vertical-align:top; font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.5; background-color:${bg};">${cell}</td>`
+                      ).join('');
+                      return `<tr>${tdHtml}</tr>`;
+                  }).join('');
+                  return `<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse; margin:10px 0; width:100%;"><thead><tr>${thHtml}</tr></thead><tbody>${tbodyHtml}</tbody></table>`;
+              };
+              enHtml = b.en ? buildTableHtml(b.en, enAlign) : '';
+              arHtml = b.ar ? buildTableHtml(b.ar, arAlign) : '';
+          } else if (conf.inputType === 'custom_html') {
+              enHtml = b.en || '';
+              arHtml = b.ar || '';
+          } else {
+              if (b.en) enHtml = conf.html.replace(/\{\{content\}\}/g, b.en).replace(/\{\{meta\}\}/g, b.enMeta).replace(/\{\{align\}\}/g, enAlign);
+              if (b.ar) arHtml = conf.html.replace(/\{\{content\}\}/g, b.ar).replace(/\{\{meta\}\}/g, b.arMeta).replace(/\{\{align\}\}/g, arAlign);
+          }
+          if (enHtml || arHtml) rowsHtml += generateRow(enHtml, rtlifyHtml(arHtml), enAlign, arAlign);
+      });
+
+      const logoEn = `<a href="https://noon.com"><img src="${GLOBAL_LAYOUT_CONFIG.headerLogoEn}" height="16" alt="Noon" style="display: block; border: 0; width: auto; height: 16px;"></a>`;
+      const logoAr = `<a href="https://noon.com"><img src="${GLOBAL_LAYOUT_CONFIG.headerLogoAr}" height="24" alt="Noon" style="display: block; border: 0; width: auto; height: 24px;"></a>`;
+      const englishLogoCell = (mode === 'bilingual' || mode === 'en') ? `<td align="left" valign="middle">${GLOBAL_LAYOUT_CONFIG.headerLogoEn ? logoEn : ''}</td>` : '';
+      const arabicLogoCell = (mode === 'bilingual' || mode === 'ar') ? `<td align="right" valign="middle" dir="rtl">${GLOBAL_LAYOUT_CONFIG.headerLogoAr ? logoAr : ''}</td>` : '';
+
+      let footerHelpText = mode === 'ar' ? GLOBAL_LAYOUT_CONFIG.footerAr : GLOBAL_LAYOUT_CONFIG.footerEn;
+      let legalFooterHtml = mode === 'ar' ? GLOBAL_LAYOUT_CONFIG.legalAr : GLOBAL_LAYOUT_CONFIG.legalEn;
+
+      return `
+      <table style="width: 100% !important; table-layout: fixed; margin: 0; padding: 0; background-color: transparent;" border="0" width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+          <tr>
+            <td align="center" valign="top">
+              
+              <table class="email-content-table" style="width: 100%; max-width: ${containerWidth}; background-color: #ffffff; box-shadow: 0 10px 25px rgba(0,0,0,0.05);" align="center" width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff">
+                <tbody>
+                  
+                  <tr>
+                    <td valign="top" style="padding: 15px 15px; background-color: #f8f8f8;" bgcolor="#f8f8f8">
+                      <table class="email-content-table" width="100%" border="0" cellpadding="0" cellspacing="0"><tbody><tr>${englishLogoCell}${arabicLogoCell}</tr></tbody></table>
+                    </td>
+                  </tr>
+                  
+                  <tr>
+                    <td style="padding: 0;">
+                      <table class="email-content-table" width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tbody>${rowsHtml}</tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  
+                  <tr>
+                    <td align="center" valign="top" style="padding: 15px 15px 10px 15px; background-color: #f8f8f8; text-align: center; font-family: Helvetica, Arial, sans-serif;" bgcolor="#f8f8f8">
+                      ${footerHelpText}
+                      ${legalFooterHtml}
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>`;
+    }
+
+    function getExportableHTML(mode) {
+      const emailContent = document.getElementById('emailPreviewArea').innerHTML;
+      const exportContent = emailContent.replace(/background-color: transparent;/g, 'background-color: #ffffff;');
+
+      return `<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style type="text/css">
+  body { margin: 0; padding: 0; width: 100% !important; background-color: #ffffff; }
+  table { border-collapse: collapse; }
+  ul, ol { padding-left: 24px; margin-top: 8px; margin-bottom: 8px; }
+  [dir="rtl"] ul, [dir="rtl"] ol { padding-left: 0; padding-right: 24px; }
+  @media only screen and (max-width: 600px) {
+    .help-col { display: block !important; width: 100% !important; padding: 10px 0 !important; text-align: center !important; }
+    .help-sep { display: none !important; }
+  }
+</style>
+</head>
+<body style="margin: 0; padding: 0;">
+<div style="width:100%; max-width:1200px; margin:0 auto;">
+${exportContent}
+</div>
+</body>
+</html>`;
+    }
+
+    function copyEmailHTML(mode) {
+      const originalMode = emailPreviewMode;
+      emailPreviewMode = mode;
+      updateTemplate(); 
+      const fullHTML = getExportableHTML(mode);
+      const el = document.createElement('textarea');
+      el.value = fullHTML;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      emailPreviewMode = originalMode;
+      updateTemplate();
+      showToast(`Copied ${mode.toUpperCase()} Email HTML to clipboard!`, "success");
+    }
+
+    async function callLLM(provider, apiKey, systemPrompt, userPrompt, retries = 5) {
+        for (let i = 0; i < retries; i++) {
+            try {
+                let url, headers, body;
+                if (provider === 'gemini') {
+                    url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                    headers = { "Content-Type": "application/json" };
+                    body = JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] } });
+                } else if (provider === 'openai') {
+                    url = `https://openrouter.ai/api/v1/chat/completions`;
+                    headers = { 
+                        "Content-Type": "application/json", 
+                        "Authorization": `Bearer ${apiKey}`,
+                        "HTTP-Referer": "http://localhost",
+                        "X-Title": "Email Builder"
+                    };
+                    body = JSON.stringify({ 
+                        model: "google/gemma-4-31b-it:free", 
+                        messages: [ { role: "user", content: systemPrompt + "\n\n" + userPrompt } ]
+                    });
+                } else if (provider === 'anthropic') {
+                    url = `https://api.anthropic.com/v1/messages`;
+                    headers = { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-dangerously-allow-browser": "true" };
+                    body = JSON.stringify({ model: "claude-3-5-sonnet-20241022", max_tokens: 4096, system: systemPrompt, messages: [{ role: "user", content: userPrompt }] });
+                }
+
+                const response = await fetch(url, { method: "POST", headers, body });
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+                const data = await response.json();
+                if (provider === 'gemini') return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                if (provider === 'openai') return data.choices?.[0]?.message?.content || "";
+                if (provider === 'anthropic') return data.content?.[0]?.text || "";
+            } catch (err) {
+                if (i === retries - 1) throw err;
+                await new Promise(res => setTimeout(res, Math.pow(2, i) * 1000));
+            }
+        }
+    }
+
+    function generateDraftXML(lang) {
+        const blocks = getBlocksData();
+        if(blocks.length === 0) return "";
+        let xml = "<email>\n";
+        blocks.forEach(b => {
+            const content = lang === 'en' ? b.en : b.ar;
+            const meta = lang === 'en' ? b.enMeta : b.arMeta;
+            const conf = BLOCKS_CONFIG.find(c => c.id === b.type);
+            if (!conf || conf.inputType === 'image' || conf.inputType === 'divider' || conf.inputType === 'table' || conf.inputType === 'custom_html') return;
+            
+            if (conf.inputType === 'title_subtitle') {
+                xml += `  <block id="${b.id}" hasMeta="true">\n    <content>${content}</content>\n    <meta>${meta}</meta>\n  </block>\n`;
+            } else if (conf.inputType === 'list') {
+                xml += `  <block id="${b.id}" type="list">\n`;
+                let items = [];
+                try { items = JSON.parse(content); } catch(e){}
+                items.forEach((item, idx) => {
+                    xml += `    <item index="${idx}">\n      <title>${item.title}</title>\n      <desc>${item.desc}</desc>\n`;
+                    if (item.linkText || item.linkUrl) {
+                        xml += `      <linkText>${item.linkText || ''}</linkText>\n      <linkUrl>${item.linkUrl || ''}</linkUrl>\n`;
+                    }
+                    xml += `    </item>\n`;
+                });
+                xml += `  </block>\n`;
+            } else {
+                xml += `  <block id="${b.id}">${content}</block>\n`;
+            }
+        });
+        xml += "</email>";
+        return xml;
+    }
+
+    function applyXMLToBlocks(xmlResponse, lang) {
+        const regex = /<block\s+id="([^"]+)"(?:[^>]*)>([\s\S]*?)<\/block>/gi;
+        let match;
+        let count = 0;
+        while ((match = regex.exec(xmlResponse)) !== null) {
+            const id = match[1];
+            const rawInner = match[2].trim();
+            const blockTag = match[0];
+            
+            if (blockTag.includes('type="list"')) {
+                let items = [];
+                const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/gi;
+                let iMatch;
+                while ((iMatch = itemRegex.exec(rawInner)) !== null) {
+                    const itemInner = iMatch[1];
+                    const titleMatch = /<title>([\s\S]*?)<\/title>/i.exec(itemInner);
+                    const descMatch = /<desc>([\s\S]*?)<\/desc>/i.exec(itemInner);
+                    const linkTextMatch = /<linkText>([\s\S]*?)<\/linkText>/i.exec(itemInner);
+                    const linkUrlMatch = /<linkUrl>([\s\S]*?)<\/linkUrl>/i.exec(itemInner);
+                    
+                    if(titleMatch && descMatch) {
+                        items.push({ 
+                            title: titleMatch[1].trim(), 
+                            desc: descMatch[1].trim(),
+                            linkText: linkTextMatch ? linkTextMatch[1].trim() : '',
+                            linkUrl: linkUrlMatch ? linkUrlMatch[1].trim() : ''
+                        });
+                    }
+                }
+                const container = document.getElementById(`list_${id}_${lang}`);
+                if (container && items.length > 0) {
+                    container.outerHTML = renderListEditor(id, lang, JSON.stringify(items));
+                    count++;
+                }
+            } else {
+                const inputEl = document.getElementById(`in_${id}_${lang}`);
+                const metaInputEl = document.getElementById(`in_${id}_${lang}_meta`);
+                
+                if (inputEl) {
+                    const contentMatch = /<content>([\s\S]*?)<\/content>/i.exec(rawInner);
+                    const metaMatch = /<meta>([\s\S]*?)<\/meta>/i.exec(rawInner);
+                    
+                    if (contentMatch && metaMatch && metaInputEl) {
+                        inputEl.value = contentMatch[1].trim();
+                        metaInputEl.value = metaMatch[1].trim();
+                    } else {
+                        if (inputEl.tagName === 'DIV') inputEl.innerHTML = rawInner;
+                        else inputEl.value = rawInner;
+                    }
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    async function runEmailReview() {
+        const activeApiKey = document.getElementById('api-key-input').value.trim() || apiKey;
+        const provider = document.getElementById('llm-provider').value;
+        if (!activeApiKey && provider !== 'gemini') return showToast(`API Key required for ${provider}. Check Settings.`, "error");
+
+        const draftXML = generateDraftXML('en');
+        if (!draftXML.replace(/<\/?\w+[^>]*>/g, '').trim()) return showToast("Please add text blocks and English text to review.", "error");
+
+        const btn = document.getElementById('btn-email-review');
+        const originalText = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = `<span class="spinner" style="border-top-color:var(--bg-panel);"></span> Reviewing...`;
+        
+        document.getElementById('email-progress-container').style.display = 'block';
+        const progFill = document.getElementById('email-progress-fill');
+        const statusText = document.getElementById('email-status-text');
+
+        try {
+            const styleContext = EMAIL_STYLE_CONFIG.map(s => `--- ${s.label.toUpperCase()} ---\n${s.content}`).join('\n\n');
+            const emailType = document.getElementById('email-type').value;
+            const structureTemplate = EMAIL_TPL_CONFIG.find(t => t.id === emailType)?.content || "";
+            const activeEngines = ENGINE_CONFIG.filter(e => e.isActive);
+
+            let engineResults = {};
+            for (let idx = 0; idx < activeEngines.length; idx++) {
+                const eng = activeEngines[idx];
+                statusText.innerText = `Running Engine: ${eng.label}...`;
+                progFill.style.width = `${(idx / (activeEngines.length + 1)) * 100}%`;
+                let system = eng.prompt + `\n\n${styleContext}\n--- STRUCTURE ---\n${structureTemplate}`;
+                try {
+                    engineResults[eng.id] = await callLLM(provider, activeApiKey, system, `Context: Email Draft\nDraft XML:\n${draftXML}`);
+                } catch(e) { console.warn(`Engine ${eng.id} failed:`, e); }
+            }
+
+            statusText.innerText = `Synthesizing final email...`;
+            progFill.style.width = `90%`;
+
+            const synthesisSystem = `You are a Senior Email Marketer. Synthesize feedback into a final email structure.
+            ${styleContext}\n--- STRUCTURE GUIDELINE ---\n${structureTemplate}
+            
+            CRITICAL: You must output the rewritten email strictly using the EXACT SAME XML tags and block IDs provided in the original draft. 
+            If a block has nested <content> and <meta> tags, or <item><title><desc> tags for lists, you MUST keep them exactly. Do NOT change the block IDs. Return ONLY the updated XML. Preserve basic HTML...`;
+            
+            const feedbackString = Object.entries(engineResults).map(([id, res]) => `Feedback (${id}): ${res}`).join("\n\n");
+            const finalXML = await callLLM(provider, activeApiKey, synthesisSystem, `Original Draft XML:\n${draftXML}\n\nFeedback:\n${feedbackString}\n\nREWRITE EMAIL (RETURN XML ONLY):`);
+            
+            const applied = applyXMLToBlocks(finalXML, 'en');
+            if (applied > 0) {
+                updateTemplate();
+                showToast(`Review Complete! Updated ${applied} blocks.`, "success");
+            } else {
+                throw new Error("AI did not return valid matching blocks.");
+            }
+        } catch (e) {
+            showToast("Review failed: " + e.message, "error");
+        } finally {
+            btn.disabled = false; btn.innerHTML = originalText;
+            progFill.style.width = "100%";
+            setTimeout(() => document.getElementById('email-progress-container').style.display = 'none', 1000);
+        }
+    }
+
+    async function translateAllEmail() {
+        const activeApiKey = document.getElementById('api-key-input').value.trim() || apiKey;
+        const provider = document.getElementById('llm-provider').value;
+        if (!activeApiKey && provider !== 'gemini') return showToast(`API Key required for ${provider}. Check Settings.`, "error");
+
+        const draftXML = generateDraftXML('en');
+        if (!draftXML.replace(/<\/?\w+[^>]*>/g, '').trim()) return showToast("Please add text blocks and English text to translate.", "error");
+
+        const btn = document.getElementById('btn-translate-all');
+        const originalText = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = `<span class="spinner" style="border-top-color:var(--text-main);"></span> Translating...`;
+
+        try {
+            const prompt = `You are an expert e-commerce translator. Translate the English content inside each <block> to professional Arabic. Ensure the tone is natural and clear. 
+            CRITICAL: Return ONLY the EXACT SAME XML structure. Do NOT change the block 'id' attributes or nested <content>/<meta> or <item><title><desc> tags. Only replace the inner text with the Arabic translation. Preserve basic HTML.`;
+
+            const finalXML = await callLLM(provider, activeApiKey, prompt, `DRAFT TO TRANSLATE:\n${draftXML}`);
+            
+            const applied = applyXMLToBlocks(finalXML, 'ar');
+            if(applied > 0) {
+                updateTemplate();
+                showToast(`Translation Complete! Translated ${applied} blocks.`, "success");
+            } else {
+                 throw new Error("AI did not return valid matching blocks.");
+            }
+        } catch (e) {
+            showToast("Translation failed: " + e.message, "error");
+        } finally {
+            btn.disabled = false; btn.innerHTML = originalText;
+        }
+    }
+
+</script>
+</body>
+</html>
