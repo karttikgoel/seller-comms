@@ -25,17 +25,17 @@ components.html("""
     padding: 1.4rem;
     display: flex; flex-direction: column; gap: 1rem;
     cursor: pointer;
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, background 0.15s;
     text-decoration: none;
   }
-  .tile:hover { border-color: #444; }
+  .tile:hover { border-color: #555; background: #222; }
 
   .tile-header { display: flex; align-items: flex-start; justify-content: space-between; }
   .tile-icon-wrap {
     width: 40px; height: 40px; border-radius: 10px;
     display: flex; align-items: center; justify-content: center; font-size: 19px;
   }
-  .tile-icon-wrap.map  { background: #0d3326; color: #34d399; }
+  .tile-icon-wrap.map     { background: #0d3326; color: #34d399; }
   .tile-icon-wrap.builder { background: #0c2240; color: #60a5fa; }
   .arrow { color: #4b5563; font-size: 17px; }
 
@@ -49,15 +49,14 @@ components.html("""
   }
 
   .divider { border: none; border-top: 1px solid #2d2d2d; margin: 0 0 1.4rem; }
-
   .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #6b7280; margin-bottom: 12px; }
 
   .shortcut-row { display: flex; gap: 10px; flex-wrap: wrap; }
   .shortcut {
     display: inline-flex; align-items: center; gap: 7px;
     background: #1a1a1a; border: 1px solid #2d2d2d; border-radius: 8px;
-    padding: 8px 14px; font-size: 13px; color: #9ca3af; cursor: pointer;
-    text-decoration: none;
+    padding: 8px 14px; font-size: 13px; color: #9ca3af;
+    text-decoration: none; cursor: pointer;
   }
   .shortcut:hover { border-color: #444; color: #e5e7eb; }
   .shortcut i { font-size: 15px; }
@@ -69,7 +68,7 @@ components.html("""
   <p class="hero-sub">Internal tools for communication workflows at noon.</p>
 
   <div class="tile-grid">
-    <div class="tile" id="map-tile">
+    <a class="tile" href="/email-map" target="_top">
       <div class="tile-header">
         <div class="tile-icon-wrap map"><i class="ti ti-map-2"></i></div>
         <i class="ti ti-arrow-up-right arrow"></i>
@@ -83,9 +82,9 @@ components.html("""
         <span class="tag">Journeys</span>
         <span class="tag">Filters</span>
       </div>
-    </div>
+    </a>
 
-    <div class="tile" id="builder-tile">
+    <a class="tile" href="/email-builder" target="_top">
       <div class="tile-header">
         <div class="tile-icon-wrap builder"><i class="ti ti-mail-forward"></i></div>
         <i class="ti ti-arrow-up-right arrow"></i>
@@ -99,27 +98,16 @@ components.html("""
         <span class="tag">Onboarding</span>
         <span class="tag">Outreach</span>
       </div>
-    </div>
+    </a>
   </div>
 
   <hr class="divider">
   <p class="section-label">Quick access</p>
   <div class="shortcut-row">
-    <a class="shortcut" id="sc-map"><i class="ti ti-map-2"></i> Email Map</a>
-    <a class="shortcut" id="sc-builder"><i class="ti ti-mail-forward"></i> Email Builder</a>
+    <a class="shortcut" href="/email-map" target="_top"><i class="ti ti-map-2"></i> Email Map</a>
+    <a class="shortcut" href="/email-builder" target="_top"><i class="ti ti-mail-forward"></i> Email Builder</a>
     <a class="shortcut" href="https://www.noon.com" target="_blank"><i class="ti ti-external-link"></i> noon Seller Portal</a>
   </div>
 </body>
 </html>
 """, height=480, scrolling=False)
-
-# Streamlit navigation buttons (hidden visually under the HTML, triggered by tile clicks isn't possible cross-frame,
-# so we keep clean labelled buttons as the nav mechanism)
-st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
-col1, col2, _ = st.columns([1, 1, 2])
-with col1:
-    if st.button("Open Email Map →", use_container_width=True):
-        st.switch_page("pages/email_map.py")
-with col2:
-    if st.button("Open Email Builder →", use_container_width=True):
-        st.switch_page("pages/email_builder.py")
