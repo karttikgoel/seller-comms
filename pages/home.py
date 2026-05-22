@@ -282,4 +282,4 @@ components.html(f"""
 </script>
 </body>
 </html>
-""", height=700, scrolling=False)
+""", height=1000, scrolling=True)
