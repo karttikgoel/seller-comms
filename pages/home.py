@@ -1,314 +1,285 @@
 import streamlit as st
-import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Comms Tools", layout="wide", page_icon="📬")
 
-# Kill Streamlit footer and tighten container
 st.markdown("""
 <style>
+  /* Tighten Streamlit container */
   .block-container {
-    padding-top: 1rem !important;
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
-    padding-bottom: 0 !important;
+    padding-top: 1.5rem !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    padding-bottom: 2rem !important;
     max-width: 100% !important;
   }
   footer { display: none !important; }
   [data-testid="stBottom"] { display: none !important; }
-</style>
-""", unsafe_allow_html=True)
 
-# ── Streamlit native top bar ──────────────────────────────
-st.markdown("""
-  <div style="line-height:1.3; margin-bottom: 8px;">
-    <span style="font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:#6b7280;">
-      noon seller comms
-    </span><br>
-    <span style="font-size:22px; font-weight:700;">Comms Tools</span><br>
-    <span style="font-size:12px; color:#9ca3af;">Internal tools for communication workflows at noon.</span>
-  </div>
-""", unsafe_allow_html=True)
-
-# ── iframe: theme auto-detected from Streamlit native messaging ────
-components.html("""
-<!DOCTYPE html>
-<html data-theme="dark">
-<head>
-<link rel="stylesheet" href="https://unpkg.com/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-<style>
-  [data-theme="dark"] {
-    --bg:             #0e0e0e;
-    --surface:        #1a1a1a;
-    --surface-deep:   #111;
-    --border:         #2d2d2d;
-    --border-hover:   #555;
-    --text-primary:   #f3f4f6;
-    --text-secondary: #9ca3af;
-    --text-muted:     #4b5563;
-    --section-label:  #c9d1db;
-    --copy-bg:        #1e1e1e;
+  /* ── Hero ── */
+  .ct-hero-label {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; opacity: 0.45;
+    color: var(--text-color);
   }
-  [data-theme="light"] {
-    --bg:             #f5f5f5;
-    --surface:        #ffffff;
-    --surface-deep:   #f9fafb;
-    --border:         #e5e7eb;
-    --border-hover:   #9ca3af;
-    --text-primary:   #111827;
-    --text-secondary: #6b7280;
-    --text-muted:     #9ca3af;
-    --section-label:  #1f2937;
-    --copy-bg:        #f3f4f6;
+  .ct-hero-title {
+    font-size: 22px; font-weight: 700;
+    color: var(--text-color); line-height: 1.2; margin: 2px 0;
+  }
+  .ct-hero-sub {
+    font-size: 12px; opacity: 0.55;
+    color: var(--text-color); margin-bottom: 1.5rem;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-  html, body { background: var(--bg); color: var(--text-primary); }
-  body { padding: 4px 20px 24px; display: flex; flex-direction: column; gap: 18px; }
-
-  .section { display: flex; flex-direction: column; gap: 10px; }
-  .section-header {
-    display: flex; align-items: center; gap: 8px;
-    padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  /* ── Section ── */
+  .ct-section { margin-bottom: 1.5rem; }
+  .ct-section-header {
+    display: flex; align-items: center; gap: 7px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid rgba(128,128,128,0.2);
+    margin-bottom: 12px;
   }
-  .section-icon { font-size: 15px; }
-  .section-icon.comms  { color: #6b7280; }
-  .section-icon.help   { color: #7c3aed; }
-  .section-icon.ticket { color: #0284c7; }
-  .section-label {
-    font-size: 13px; font-weight: 700;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--section-label);
+  .ct-section-icon { font-size: 14px; }
+  .ct-section-icon.comms  { color: #6b7280; }
+  .ct-section-icon.help   { color: #7c3aed; }
+  .ct-section-icon.ticket { color: #0284c7; }
+  .ct-section-label {
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--text-color);
   }
 
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-
-  .tile {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    padding: 16px; display: flex; flex-direction: column; gap: 10px;
-    text-decoration: none; transition: border-color 0.15s, box-shadow 0.15s;
+  /* ── Grid ── */
+  .ct-grid-3 {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
   }
-  .tile:hover { border-color: var(--border-hover); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-  .tile-top { display: flex; align-items: flex-start; justify-content: space-between; }
-  .tile-icon {
+
+  /* ── Nav tile ── */
+  a.ct-tile {
+    display: flex; flex-direction: column; gap: 10px;
+    background: var(--secondary-background-color);
+    border: 1px solid rgba(128,128,128,0.18);
+    border-radius: 14px; padding: 16px;
+    text-decoration: none !important;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  a.ct-tile:hover {
+    border-color: rgba(128,128,128,0.45);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  }
+  .ct-tile-top {
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .ct-icon {
     width: 36px; height: 36px; border-radius: 9px;
-    display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
   }
-  .tile-icon.map     { background: #0d3326; color: #34d399; }
-  .tile-icon.builder { background: #0c2240; color: #60a5fa; }
-  .tile-icon.mail    { background: #2d1a00; color: #f59e0b; }
-  .tile-icon.help    { background: #1c1040; color: #a78bfa; }
-  .tile-icon.ticket  { background: #001e2d; color: #38bdf8; }
-  .arrow      { color: var(--text-muted); font-size: 15px; }
-  .tile-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
-  .tile-desc  { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
-
-  .launcher {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    padding: 16px; display: flex; flex-direction: column; gap: 10px;
+  .ct-icon.map     { background: #0d3326; color: #34d399; }
+  .ct-icon.builder { background: #0c2240; color: #60a5fa; }
+  .ct-icon.mail    { background: #2d1a00; color: #f59e0b; }
+  .ct-icon.help    { background: #1c1040; color: #a78bfa; }
+  .ct-icon.ticket  { background: #001e2d; color: #38bdf8; }
+  .ct-arrow { font-size: 15px; opacity: 0.35; color: var(--text-color); }
+  .ct-tile-title {
+    font-size: 14px; font-weight: 600;
+    color: var(--text-color); margin: 0 0 3px;
   }
-  .launcher-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+  .ct-tile-desc {
+    font-size: 12px; line-height: 1.55;
+    color: var(--text-color); opacity: 0.6; margin: 0;
+  }
 
-  .link-list { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
-  .link-item {
+  /* ── Launcher tile (no anchor) ── */
+  .ct-launcher {
+    display: flex; flex-direction: column; gap: 10px;
+    background: var(--secondary-background-color);
+    border: 1px solid rgba(128,128,128,0.18);
+    border-radius: 14px; padding: 16px;
+  }
+  .ct-launcher-desc {
+    font-size: 12px; line-height: 1.55;
+    color: var(--text-color); opacity: 0.6; margin: 0;
+  }
+
+  /* ── Link rows inside launcher ── */
+  .ct-link-list { display: flex; flex-direction: column; gap: 6px; }
+  a.ct-link {
     display: flex; align-items: center; justify-content: space-between;
-    background: var(--surface-deep); border: 1px solid var(--border); border-radius: 8px;
-    padding: 9px 12px; text-decoration: none; transition: border-color 0.15s; gap: 8px;
+    background: var(--background-color);
+    border: 1px solid rgba(128,128,128,0.15);
+    border-radius: 8px; padding: 9px 12px;
+    text-decoration: none !important;
+    transition: border-color 0.15s; gap: 8px;
   }
-  .link-item:hover { border-color: var(--border-hover); }
-  .link-item-left { display: flex; align-items: center; gap: 8px; }
-  .link-item-row {
+  a.ct-link:hover { border-color: rgba(128,128,128,0.4); }
+  .ct-link-left { display: flex; align-items: center; gap: 8px; }
+  .ct-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .ct-dot.mail   { background: #f59e0b; }
+  .ct-dot.help   { background: #a78bfa; }
+  .ct-dot.ticket { background: #38bdf8; }
+  .ct-link-name {
+    font-size: 13px; font-weight: 500;
+    color: var(--text-color);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ct-link-ext { font-size: 13px; opacity: 0.3; color: var(--text-color); flex-shrink: 0; }
+
+  /* ── Copy row (link + copy btn) ── */
+  .ct-copy-row {
     display: flex; align-items: center;
-    background: var(--surface-deep); border: 1px solid var(--border); border-radius: 8px;
-    padding: 9px 12px; gap: 8px; transition: border-color 0.15s;
+    background: var(--background-color);
+    border: 1px solid rgba(128,128,128,0.15);
+    border-radius: 8px; padding: 9px 12px; gap: 8px;
+    transition: border-color 0.15s;
   }
-  .link-item-row:hover { border-color: var(--border-hover); }
-  .link-anchor { display: flex; align-items: center; gap: 8px; text-decoration: none; flex: 1; min-width: 0; }
-  .dot        { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  .dot-mail   { background: #f59e0b; }
-  .dot-help   { background: #a78bfa; }
-  .dot-ticket { background: #38bdf8; }
-  .link-name  { font-size: 13px; color: var(--text-primary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .link-ext   { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
-  .link-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
-  .copy-btn {
+  .ct-copy-row:hover { border-color: rgba(128,128,128,0.4); }
+  a.ct-copy-anchor {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none !important; flex: 1; min-width: 0;
+  }
+  .ct-copy-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+  button.ct-copy-btn {
     display: flex; align-items: center; justify-content: center;
     width: 24px; height: 24px; border-radius: 6px;
-    background: var(--copy-bg); border: 1px solid var(--border);
-    color: var(--text-muted); cursor: pointer; font-size: 12px;
+    background: rgba(128,128,128,0.1);
+    border: 1px solid rgba(128,128,128,0.2);
+    color: var(--text-color); opacity: 0.5;
+    cursor: pointer; font-size: 12px;
     transition: all 0.15s; outline: none; flex-shrink: 0;
   }
-  .copy-btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
-  .copy-btn.copied { background: #0d3326; color: #34d399; border-color: #1a5c40; }
+  button.ct-copy-btn:hover { opacity: 1; border-color: rgba(128,128,128,0.5); }
+  button.ct-copy-btn.copied { background: #0d3326; color: #34d399; border-color: #1a5c40; opacity: 1; }
 </style>
-</head>
-<body>
 
-  <!-- Comms Tools -->
-  <div class="section">
-    <div class="section-header">
-      <i class="ti ti-tools section-icon comms"></i>
-      <span class="section-label">Comms Tools</span>
-    </div>
-    <div class="grid-3">
-      <a class="tile" href="/email-map" target="_top">
-        <div class="tile-top">
-          <div class="tile-icon map"><i class="ti ti-map-2"></i></div>
-          <i class="ti ti-arrow-up-right arrow"></i>
-        </div>
-        <p class="tile-title">Email Map</p>
-        <p class="tile-desc">Visualise and navigate your full email communication structure across teams.</p>
-      </a>
-      <a class="tile" href="/email-builder" target="_top">
-        <div class="tile-top">
-          <div class="tile-icon builder"><i class="ti ti-mail-forward"></i></div>
-          <i class="ti ti-arrow-up-right arrow"></i>
-        </div>
-        <p class="tile-title">Email Builder</p>
-        <p class="tile-desc">Build and customise email templates for DSE seller communications and outreach.</p>
-      </a>
-      <div class="launcher">
-        <div class="tile-icon mail" style="margin-bottom:4px"><i class="ti ti-send"></i></div>
-        <p class="tile-title">Mail Deployment</p>
-        <p class="launcher-desc">Send and manage campaigns via noon's mailing infrastructure.</p>
-        <div class="link-list">
-          <a class="link-item" href="https://notification-cms.noon.team/partner/email/template/" target="_blank">
-            <div class="link-item-left"><div class="dot dot-mail"></div><span class="link-name">Notification CMS</span></div>
-            <i class="ti ti-external-link link-ext"></i>
-          </a>
-          <a class="link-item" href="https://crm.noon.team/campaign?tenant=partner" target="_blank">
-            <div class="link-item-left"><div class="dot dot-mail"></div><span class="link-name">Cerebro (noon CRM)</span></div>
-            <i class="ti ti-external-link link-ext"></i>
-          </a>
-        </div>
+<!-- Hero -->
+<p class="ct-hero-label">noon seller comms</p>
+<p class="ct-hero-title">Comms Tools</p>
+<p class="ct-hero-sub">Internal tools for communication workflows at noon.</p>
+
+<!-- Comms Tools -->
+<div class="ct-section">
+  <div class="ct-section-header">
+    <i class="ti ti-tools ct-section-icon comms"></i>
+    <span class="ct-section-label">Comms Tools</span>
+  </div>
+  <div class="ct-grid-3">
+
+    <a class="ct-tile" href="/email-map" target="_top">
+      <div class="ct-tile-top">
+        <div class="ct-icon map"><i class="ti ti-map-2"></i></div>
+        <i class="ti ti-arrow-up-right ct-arrow"></i>
+      </div>
+      <p class="ct-tile-title">Email Map</p>
+      <p class="ct-tile-desc">Visualise and navigate your full email communication structure across teams.</p>
+    </a>
+
+    <a class="ct-tile" href="/email-builder" target="_top">
+      <div class="ct-tile-top">
+        <div class="ct-icon builder"><i class="ti ti-mail-forward"></i></div>
+        <i class="ti ti-arrow-up-right ct-arrow"></i>
+      </div>
+      <p class="ct-tile-title">Email Builder</p>
+      <p class="ct-tile-desc">Build and customise email templates for DSE seller communications and outreach.</p>
+    </a>
+
+    <div class="ct-launcher">
+      <div class="ct-icon mail" style="margin-bottom:4px"><i class="ti ti-send"></i></div>
+      <p class="ct-tile-title">Mail Deployment</p>
+      <p class="ct-launcher-desc">Send and manage campaigns via noon's mailing infrastructure.</p>
+      <div class="ct-link-list">
+        <a class="ct-link" href="https://notification-cms.noon.team/partner/email/template/" target="_blank">
+          <div class="ct-link-left"><div class="ct-dot mail"></div><span class="ct-link-name">Notification CMS</span></div>
+          <i class="ti ti-external-link ct-link-ext"></i>
+        </a>
+        <a class="ct-link" href="https://crm.noon.team/campaign?tenant=partner" target="_blank">
+          <div class="ct-link-left"><div class="ct-dot mail"></div><span class="ct-link-name">Cerebro (noon CRM)</span></div>
+          <i class="ti ti-external-link ct-link-ext"></i>
+        </a>
       </div>
     </div>
-  </div>
 
-  <!-- Help Center -->
-  <div class="section">
-    <div class="section-header">
-      <i class="ti ti-lifebuoy section-icon help"></i>
-      <span class="section-label">Help Center</span>
-    </div>
-    <div class="grid-3">
-      <div class="launcher">
-        <div class="tile-icon help" style="margin-bottom:4px"><i class="ti ti-headset"></i></div>
-        <p class="tile-title">Help Center Tools</p>
-        <p class="launcher-desc">Manage and access noon's partner and team help center platforms.</p>
-        <div class="link-list">
-          <a class="link-item" href="https://helpcenter.noon.partners/" target="_blank">
-            <div class="link-item-left"><div class="dot dot-help"></div><span class="link-name">Admin Panel</span></div>
-            <i class="ti ti-external-link link-ext"></i>
+  </div>
+</div>
+
+<!-- Help Center -->
+<div class="ct-section">
+  <div class="ct-section-header">
+    <i class="ti ti-lifebuoy ct-section-icon help"></i>
+    <span class="ct-section-label">Help Center</span>
+  </div>
+  <div class="ct-grid-3">
+    <div class="ct-launcher">
+      <div class="ct-icon help" style="margin-bottom:4px"><i class="ti ti-headset"></i></div>
+      <p class="ct-tile-title">Help Center Tools</p>
+      <p class="ct-launcher-desc">Manage and access noon's partner and team help center platforms.</p>
+      <div class="ct-link-list">
+        <a class="ct-link" href="https://helpcenter.noon.partners/" target="_blank">
+          <div class="ct-link-left"><div class="ct-dot help"></div><span class="ct-link-name">Admin Panel</span></div>
+          <i class="ti ti-external-link ct-link-ext"></i>
+        </a>
+        <div class="ct-copy-row">
+          <a class="ct-copy-anchor" href="https://helpcenter.noon.team/" target="_blank">
+            <div class="ct-dot help"></div><span class="ct-link-name">Help Center Portal</span>
           </a>
-          <div class="link-item-row">
-            <a class="link-anchor" href="https://helpcenter.noon.team/" target="_blank">
-              <div class="dot dot-help"></div><span class="link-name">Help Center Portal</span>
+          <div class="ct-copy-actions">
+            <button class="ct-copy-btn" onclick="ctCopy(this,'https://helpcenter.noon.team/')" title="Copy link">
+              <i class="ti ti-copy"></i>
+            </button>
+            <a href="https://helpcenter.noon.team/" target="_blank" style="display:flex;align-items:center;">
+              <i class="ti ti-external-link ct-link-ext"></i>
             </a>
-            <div class="link-actions">
-              <button class="copy-btn" onclick="copyLink(this,'https://helpcenter.noon.team/')" title="Copy link"><i class="ti ti-copy"></i></button>
-              <a href="https://helpcenter.noon.team/" target="_blank" style="display:flex;align-items:center;"><i class="ti ti-external-link link-ext"></i></a>
-            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Ticket Handling -->
-  <div class="section">
-    <div class="section-header">
-      <i class="ti ti-ticket section-icon ticket"></i>
-      <span class="section-label">Ticket Handling</span>
-    </div>
-    <div class="grid-3">
-      <div class="launcher">
-        <div class="tile-icon ticket" style="margin-bottom:4px"><i class="ti ti-brand-jira"></i></div>
-        <p class="tile-title">JIRA</p>
-        <p class="launcher-desc">Manage and raise support tickets for partner operations.</p>
-        <div class="link-list">
-          <a class="link-item" href="https://next-square.atlassian.net/jira/servicedesk/projects/SC/queues/custom/962" target="_blank">
-            <div class="link-item-left"><div class="dot dot-ticket"></div><span class="link-name">Tickets Admin Panel</span></div>
-            <i class="ti ti-external-link link-ext"></i>
+<!-- Ticket Handling -->
+<div class="ct-section">
+  <div class="ct-section-header">
+    <i class="ti ti-ticket ct-section-icon ticket"></i>
+    <span class="ct-section-label">Ticket Handling</span>
+  </div>
+  <div class="ct-grid-3">
+    <div class="ct-launcher">
+      <div class="ct-icon ticket" style="margin-bottom:4px"><i class="ti ti-brand-jira"></i></div>
+      <p class="ct-tile-title">JIRA</p>
+      <p class="ct-launcher-desc">Manage and raise support tickets for partner operations.</p>
+      <div class="ct-link-list">
+        <a class="ct-link" href="https://next-square.atlassian.net/jira/servicedesk/projects/SC/queues/custom/962" target="_blank">
+          <div class="ct-link-left"><div class="ct-dot ticket"></div><span class="ct-link-name">Tickets Admin Panel</span></div>
+          <i class="ti ti-external-link ct-link-ext"></i>
+        </a>
+        <div class="ct-copy-row">
+          <a class="ct-copy-anchor" href="https://next-square.atlassian.net/servicedesk/customer/portal/89" target="_blank">
+            <div class="ct-dot ticket"></div><span class="ct-link-name">New JIRA Ticket</span>
           </a>
-          <div class="link-item-row">
-            <a class="link-anchor" href="https://next-square.atlassian.net/servicedesk/customer/portal/89" target="_blank">
-              <div class="dot dot-ticket"></div><span class="link-name">New JIRA Ticket</span>
+          <div class="ct-copy-actions">
+            <button class="ct-copy-btn" onclick="ctCopy(this,'https://next-square.atlassian.net/servicedesk/customer/portal/89')" title="Copy link">
+              <i class="ti ti-copy"></i>
+            </button>
+            <a href="https://next-square.atlassian.net/servicedesk/customer/portal/89" target="_blank" style="display:flex;align-items:center;">
+              <i class="ti ti-external-link ct-link-ext"></i>
             </a>
-            <div class="link-actions">
-              <button class="copy-btn" onclick="copyLink(this,'https://next-square.atlassian.net/servicedesk/customer/portal/89')" title="Copy link"><i class="ti ti-copy"></i></button>
-              <a href="https://next-square.atlassian.net/servicedesk/customer/portal/89" target="_blank" style="display:flex;align-items:center;"><i class="ti ti-external-link link-ext"></i></a>
-            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
+<link rel="stylesheet" href="https://unpkg.com/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <script>
-  // ── Setup Communication with Streamlit ──────────────────
-  // Tell Streamlit the component is ready to receive data FIRST
-  window.parent.postMessage({
-    isStreamlitMessage: true,
-    type: "streamlit:setComponentReady",
-    apiVersion: 1
-  }, "*");
-
-  // ── Dynamic height ──────────────────────────────────────
-  function syncHeight() {
-    window.parent.postMessage({
-      isStreamlitMessage: true,
-      type: 'streamlit:setFrameHeight',
-      height: document.documentElement.scrollHeight
-    }, '*');
-  }
-  
-  // Attach observers to continually sync height
-  window.addEventListener('load', syncHeight);
-  new ResizeObserver(syncHeight).observe(document.body);
-
-  // ── Theme sync via Streamlit's native messaging ──────
-  function onStreamlitMessage(event) {
-    if (event.data.type === 'streamlit:render') {
-      const theme = event.data.theme;
-      if (theme) {
-        // Streamlit passes theme.base as "light" or "dark"
-        document.documentElement.setAttribute('data-theme', theme.base === 'light' ? 'light' : 'dark');
-        syncHeight(); // Re-sync height just in case theme styling adjusts elements
-      }
-    }
-  }
-  
-  // Listen for render messages from the Streamlit parent
-  window.addEventListener('message', onStreamlitMessage);
-
-
-  // ── Environment-Safe Copy to Clipboard ──
-  function copyLink(btn, url) {
-    // Fallback using execCommand since navigator.clipboard can fail in sandboxed iframes
-    const textArea = document.createElement("textarea");
-    textArea.value = url;
-    textArea.style.position = "fixed";
-    textArea.style.left = "-9999px";
-    textArea.style.top = "0";
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    
-    try {
-      document.execCommand('copy');
+  function ctCopy(btn, url) {
+    navigator.clipboard.writeText(url).then(function() {
       btn.classList.add('copied');
       btn.innerHTML = '<i class="ti ti-check"></i>';
-      setTimeout(function() { 
-        btn.classList.remove('copied'); 
-        btn.innerHTML = '<i class="ti ti-copy"></i>'; 
+      setTimeout(function() {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<i class="ti ti-copy"></i>';
       }, 2000);
-    } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err);
-    }
-    
-    document.body.removeChild(textArea);
+    });
   }
 </script>
-</body>
-</html>
-""")
+""", unsafe_allow_html=True)
