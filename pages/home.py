@@ -245,14 +245,24 @@ components.html("""
   </div>
 
 <script>
+  // ── Setup Communication with Streamlit ──────────────────
+  // Tell Streamlit the component is ready to receive data FIRST
+  window.parent.postMessage({
+    isStreamlitMessage: true,
+    type: "streamlit:setComponentReady",
+    apiVersion: 1
+  }, "*");
+
   // ── Dynamic height ──────────────────────────────────────
   function syncHeight() {
     window.parent.postMessage({
       isStreamlitMessage: true,
       type: 'streamlit:setFrameHeight',
-      height: document.body.scrollHeight + 20
+      height: document.documentElement.scrollHeight
     }, '*');
   }
+  
+  // Attach observers to continually sync height
   window.addEventListener('load', syncHeight);
   new ResizeObserver(syncHeight).observe(document.body);
 
@@ -263,6 +273,7 @@ components.html("""
       if (theme) {
         // Streamlit passes theme.base as "light" or "dark"
         document.documentElement.setAttribute('data-theme', theme.base === 'light' ? 'light' : 'dark');
+        syncHeight(); // Re-sync height just in case theme styling adjusts elements
       }
     }
   }
@@ -270,12 +281,6 @@ components.html("""
   // Listen for render messages from the Streamlit parent
   window.addEventListener('message', onStreamlitMessage);
 
-  // Tell Streamlit the component is ready to receive the theme data
-  window.parent.postMessage({
-    isStreamlitMessage: true,
-    type: "streamlit:setComponentReady",
-    apiVersion: 1
-  }, "*");
 
   // ── Environment-Safe Copy to Clipboard ──
   function copyLink(btn, url) {
@@ -306,4 +311,4 @@ components.html("""
 </script>
 </body>
 </html>
-""", height=900, scrolling=True)
+""")
