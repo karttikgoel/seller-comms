@@ -259,6 +259,15 @@ components.html(f"""
   </div>
 
 <script>
+  // Auto-size iframe to content height + 20px bottom padding
+  function syncHeight() {{
+    const h = document.body.scrollHeight + 20;
+    window.parent.postMessage({{type: 'streamlit:setFrameHeight', height: h}}, '*');
+  }}
+  // Fire on load and whenever content resizes
+  window.addEventListener('load', syncHeight);
+  new ResizeObserver(syncHeight).observe(document.body);
+
   function copyLink(btn, url) {{
     navigator.clipboard.writeText(url).then(function() {{
       btn.classList.add('copied');
@@ -269,4 +278,4 @@ components.html(f"""
 </script>
 </body>
 </html>
-""", height=720, scrolling=True)
+""", height=2000, scrolling=False)
