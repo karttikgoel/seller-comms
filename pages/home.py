@@ -29,7 +29,7 @@ st.markdown("""
   </div>
 """, unsafe_allow_html=True)
 
-# ── iframe: theme auto-detected from Streamlit parent ────
+# ── iframe: theme auto-detected from Streamlit native messaging ────
 components.html("""
 <!DOCTYPE html>
 <html data-theme="dark">
@@ -62,7 +62,7 @@ components.html("""
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-  html, body { background: var(--bg); }
+  html, body { background: var(--bg); color: var(--text-primary); }
   body { padding: 4px 20px 24px; display: flex; flex-direction: column; gap: 18px; }
 
   .section { display: flex; flex-direction: column; gap: 10px; }
@@ -246,7 +246,6 @@ components.html("""
 
 <script>
   // ── Dynamic height ──────────────────────────────────────
-  // isStreamlitMessage:true is required for Streamlit to act on this
   function syncHeight() {
     window.parent.postMessage({
       isStreamlitMessage: true,
@@ -257,30 +256,52 @@ components.html("""
   window.addEventListener('load', syncHeight);
   new ResizeObserver(syncHeight).observe(document.body);
 
-  // ── Theme sync from Streamlit parent (same-origin) ──────
-  function applyParentTheme() {
-    try {
-      const bg = getComputedStyle(window.parent.document.body).backgroundColor;
-      const rgb = bg.match(/\d+/g);
-      if (rgb) {
-        const luminance = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
-        document.documentElement.setAttribute('data-theme', luminance < 128 ? 'dark' : 'light');
+  // ── Theme sync via Streamlit's native messaging ──────
+  function onStreamlitMessage(event) {
+    if (event.data.type === 'streamlit:render') {
+      const theme = event.data.theme;
+      if (theme) {
+        // Streamlit passes theme.base as "light" or "dark"
+        document.documentElement.setAttribute('data-theme', theme.base === 'light' ? 'light' : 'dark');
       }
-    } catch(e) {}
+    }
   }
-  applyParentTheme();
-  // Re-check when Streamlit re-renders and changes body styles
-  new MutationObserver(applyParentTheme).observe(
-    window.parent.document.body,
-    { attributes: true, attributeFilter: ['class', 'style'], subtree: false }
-  );
+  
+  // Listen for render messages from the Streamlit parent
+  window.addEventListener('message', onStreamlitMessage);
 
+  // Tell Streamlit the component is ready to receive the theme data
+  window.parent.postMessage({
+    isStreamlitMessage: true,
+    type: "streamlit:setComponentReady",
+    apiVersion: 1
+  }, "*");
+
+  // ── Environment-Safe Copy to Clipboard ──
   function copyLink(btn, url) {
-    navigator.clipboard.writeText(url).then(function() {
+    // Fallback using execCommand since navigator.clipboard can fail in sandboxed iframes
+    const textArea = document.createElement("textarea");
+    textArea.value = url;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    textArea.style.top = "0";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
       btn.classList.add('copied');
       btn.innerHTML = '<i class="ti ti-check"></i>';
-      setTimeout(function() { btn.classList.remove('copied'); btn.innerHTML = '<i class="ti ti-copy"></i>'; }, 2000);
-    });
+      setTimeout(function() { 
+        btn.classList.remove('copied'); 
+        btn.innerHTML = '<i class="ti ti-copy"></i>'; 
+      }, 2000);
+    } catch (err) {
+      console.error('Fallback: Oops, unable to copy', err);
+    }
+    
+    document.body.removeChild(textArea);
   }
 </script>
 </body>
