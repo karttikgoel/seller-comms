@@ -3,96 +3,91 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Comms Tools", layout="wide", page_icon="📬")
 
+# Tighten Streamlit's own container padding
+st.markdown("""
+<style>
+  .block-container { padding-top: 0.5rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+</style>
+""", unsafe_allow_html=True)
+
 components.html("""
 <!DOCTYPE html>
 <html data-theme="dark">
 <head>
 <link rel="stylesheet" href="https://unpkg.com/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <style>
-  /* ── Theme tokens ── */
   [data-theme="dark"] {
-    --bg:           #0e0e0e;
-    --surface:      #1a1a1a;
-    --surface-deep: #111;
-    --border:       #2d2d2d;
-    --border-hover: #444;
-    --text-primary: #f3f4f6;
+    --bg:             #0e0e0e;
+    --surface:        #1a1a1a;
+    --surface-deep:   #111;
+    --border:         #2d2d2d;
+    --border-hover:   #555;
+    --text-primary:   #f3f4f6;
     --text-secondary: #9ca3af;
-    --text-muted:   #4b5563;
-    --tag-bg:       #242424;
-    --tag-text:     #6b7280;
-    --section-label: #9ca3af;
-    --copy-bg:      #1e1e1e;
-    --toggle-bg:    #2a2a2a;
-    --toggle-border:#3a3a3a;
-    --toggle-text:  #9ca3af;
+    --text-muted:     #4b5563;
+    --section-label:  #c9d1db;
+    --copy-bg:        #1e1e1e;
+    --toggle-bg:      #2a2a2a;
+    --toggle-border:  #3a3a3a;
+    --toggle-text:    #9ca3af;
   }
   [data-theme="light"] {
-    --bg:           #f5f5f5;
-    --surface:      #ffffff;
-    --surface-deep: #f9fafb;
-    --border:       #e5e7eb;
-    --border-hover: #9ca3af;
-    --text-primary: #111827;
+    --bg:             #f5f5f5;
+    --surface:        #ffffff;
+    --surface-deep:   #f9fafb;
+    --border:         #e5e7eb;
+    --border-hover:   #9ca3af;
+    --text-primary:   #111827;
     --text-secondary: #6b7280;
-    --text-muted:   #9ca3af;
-    --tag-bg:       #f3f4f6;
-    --tag-text:     #6b7280;
-    --section-label: #374151;
-    --copy-bg:      #f3f4f6;
-    --toggle-bg:    #e5e7eb;
-    --toggle-border:#d1d5db;
-    --toggle-text:  #374151;
+    --text-muted:     #9ca3af;
+    --section-label:  #1f2937;
+    --copy-bg:        #f3f4f6;
+    --toggle-bg:      #e5e7eb;
+    --toggle-border:  #d1d5db;
+    --toggle-text:    #374151;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
   html, body { background: var(--bg); transition: background 0.2s; }
-  body { padding: 16px 4px 24px; display: flex; flex-direction: column; gap: 20px; }
+  body { padding: 12px 0 24px; display: flex; flex-direction: column; gap: 18px; }
 
-  /* ── Top bar ── */
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between;
-  }
+  /* Hero */
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; }
   .hero-meta { display: flex; flex-direction: column; gap: 2px; }
   .hero-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
   .hero-title { font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
   .hero-sub   { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
-  /* ── Theme toggle ── */
+  /* Toggle */
   .toggle-btn {
     display: flex; align-items: center; gap: 6px;
     padding: 7px 12px; border-radius: 8px;
     background: var(--toggle-bg); border: 1px solid var(--toggle-border);
     color: var(--toggle-text); font-size: 12px; font-weight: 500;
-    cursor: pointer; transition: all 0.15s; white-space: nowrap;
-    outline: none;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap; outline: none;
   }
   .toggle-btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
   .toggle-btn i { font-size: 14px; }
 
-  /* ── Section ── */
+  /* Section */
   .section { display: flex; flex-direction: column; gap: 10px; }
-  .section-header { display: flex; align-items: center; gap: 8px; padding-bottom: 2px; border-bottom: 1px solid var(--border); }
+  .section-header { display: flex; align-items: center; gap: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
   .section-icon { font-size: 15px; }
   .section-icon.comms  { color: #6b7280; }
   .section-icon.help   { color: #7c3aed; }
   .section-icon.ticket { color: #0284c7; }
-  .section-label {
-    font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
-    text-transform: uppercase; color: var(--section-label);
-  }
+  .section-label { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--section-label); }
 
-  /* ── Grid ── */
+  /* All grids use 3 columns so tile widths stay consistent */
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .grid-1 { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
-  /* ── Nav tile ── */
+  /* Nav tile */
   .tile {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 16px; display: flex; flex-direction: column; gap: 10px;
     text-decoration: none; transition: border-color 0.15s, box-shadow 0.15s;
   }
-  .tile:hover { border-color: var(--border-hover); box-shadow: 0 2px 10px rgba(0,0,0,0.12); }
+  .tile:hover { border-color: var(--border-hover); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
   .tile-top { display: flex; align-items: flex-start; justify-content: space-between; }
   .tile-icon {
@@ -108,25 +103,21 @@ components.html("""
   .arrow { color: var(--text-muted); font-size: 15px; }
   .tile-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
   .tile-desc  { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
-  .tile-tags  { display: flex; gap: 5px; flex-wrap: wrap; margin-top: auto; }
-  .tag { font-size: 10px; padding: 2px 8px; border-radius: 100px; background: var(--tag-bg); color: var(--tag-text); border: 1px solid var(--border); }
 
-  /* ── Launcher tile ── */
+  /* Launcher tile */
   .launcher {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 16px; display: flex; flex-direction: column; gap: 10px;
   }
-  .launcher-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
-  .launcher-desc  { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+  .launcher-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
 
-  /* ── Link items ── */
-  .link-list { display: flex; flex-direction: column; gap: 6px; }
+  /* Link items */
+  .link-list { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
 
   .link-item {
     display: flex; align-items: center; justify-content: space-between;
     background: var(--surface-deep); border: 1px solid var(--border); border-radius: 8px;
-    padding: 9px 12px; text-decoration: none;
-    transition: border-color 0.15s; gap: 8px;
+    padding: 9px 12px; text-decoration: none; transition: border-color 0.15s; gap: 8px;
   }
   .link-item:hover { border-color: var(--border-hover); }
   .link-item-left { display: flex; align-items: center; gap: 8px; }
@@ -161,7 +152,7 @@ components.html("""
 </head>
 <body>
 
-  <!-- Top bar -->
+  <!-- Hero -->
   <div class="topbar">
     <div class="hero-meta">
       <span class="hero-label">noon seller comms</span>
@@ -187,13 +178,8 @@ components.html("""
           <div class="tile-icon map"><i class="ti ti-map-2"></i></div>
           <i class="ti ti-arrow-up-right arrow"></i>
         </div>
-        <div>
-          <p class="tile-title">Email Map</p>
-          <p class="tile-desc">Visualise and navigate your full email communication structure across teams.</p>
-        </div>
-        <div class="tile-tags">
-          <span class="tag">Templates</span><span class="tag">Journeys</span><span class="tag">Filters</span>
-        </div>
+        <p class="tile-title">Email Map</p>
+        <p class="tile-desc">Visualise and navigate your full email communication structure across teams.</p>
       </a>
 
       <a class="tile" href="/email-builder" target="_top">
@@ -201,23 +187,14 @@ components.html("""
           <div class="tile-icon builder"><i class="ti ti-mail-forward"></i></div>
           <i class="ti ti-arrow-up-right arrow"></i>
         </div>
-        <div>
-          <p class="tile-title">Email Builder</p>
-          <p class="tile-desc">Build and customise email templates for DSE seller communications and outreach.</p>
-        </div>
-        <div class="tile-tags">
-          <span class="tag">DSE</span><span class="tag">Onboarding</span><span class="tag">Outreach</span>
-        </div>
+        <p class="tile-title">Email Builder</p>
+        <p class="tile-desc">Build and customise email templates for DSE seller communications and outreach.</p>
       </a>
 
       <div class="launcher">
-        <div class="tile-top">
-          <div class="tile-icon mail"><i class="ti ti-send"></i></div>
-        </div>
-        <div>
-          <p class="tile-title">Mail Deployment</p>
-          <p class="launcher-desc">Send and manage campaigns via noon's mailing infrastructure.</p>
-        </div>
+        <div class="tile-icon mail" style="margin-bottom:4px"><i class="ti ti-send"></i></div>
+        <p class="tile-title">Mail Deployment</p>
+        <p class="launcher-desc">Send and manage campaigns via noon's mailing infrastructure.</p>
         <div class="link-list">
           <a class="link-item" href="https://notification-cms.noon.team/partner/email/template/" target="_blank">
             <div class="link-item-left"><div class="dot dot-mail"></div><span class="link-name">Notification CMS</span></div>
@@ -239,15 +216,11 @@ components.html("""
       <i class="ti ti-lifebuoy section-icon help"></i>
       <span class="section-label">Help Center</span>
     </div>
-    <div class="grid-1">
+    <div class="grid-3">
       <div class="launcher">
-        <div class="tile-top">
-          <div class="tile-icon help"><i class="ti ti-headset"></i></div>
-        </div>
-        <div>
-          <p class="tile-title">Help Center Tools</p>
-          <p class="launcher-desc">Manage and access noon's partner and team help center platforms.</p>
-        </div>
+        <div class="tile-icon help" style="margin-bottom:4px"><i class="ti ti-headset"></i></div>
+        <p class="tile-title">Help Center Tools</p>
+        <p class="launcher-desc">Manage and access noon's partner and team help center platforms.</p>
         <div class="link-list">
           <a class="link-item" href="https://helpcenter.noon.partners/" target="_blank">
             <div class="link-item-left"><div class="dot dot-help"></div><span class="link-name">Admin Panel</span></div>
@@ -273,15 +246,11 @@ components.html("""
       <i class="ti ti-ticket section-icon ticket"></i>
       <span class="section-label">Ticket Handling</span>
     </div>
-    <div class="grid-1">
+    <div class="grid-3">
       <div class="launcher">
-        <div class="tile-top">
-          <div class="tile-icon ticket"><i class="ti ti-brand-jira"></i></div>
-        </div>
-        <div>
-          <p class="tile-title">JIRA</p>
-          <p class="launcher-desc">Manage and raise support tickets for partner operations.</p>
-        </div>
+        <div class="tile-icon ticket" style="margin-bottom:4px"><i class="ti ti-brand-jira"></i></div>
+        <p class="tile-title">JIRA</p>
+        <p class="launcher-desc">Manage and raise support tickets for partner operations.</p>
         <div class="link-list">
           <a class="link-item" href="https://next-square.atlassian.net/jira/servicedesk/projects/SC/queues/custom/962" target="_blank">
             <div class="link-item-left"><div class="dot dot-ticket"></div><span class="link-name">Tickets Admin Panel</span></div>
@@ -309,15 +278,11 @@ components.html("""
     document.getElementById('theme-icon').className = isDark ? 'ti ti-moon' : 'ti ti-sun';
     document.getElementById('theme-label').textContent = isDark ? 'Light mode' : 'Dark mode';
   }
-
   function copyLink(btn, url) {
     navigator.clipboard.writeText(url).then(function() {
       btn.classList.add('copied');
       btn.innerHTML = '<i class="ti ti-check"></i>';
-      setTimeout(function() {
-        btn.classList.remove('copied');
-        btn.innerHTML = '<i class="ti ti-copy"></i>';
-      }, 2000);
+      setTimeout(function() { btn.classList.remove('copied'); btn.innerHTML = '<i class="ti ti-copy"></i>'; }, 2000);
     });
   }
 </script>
