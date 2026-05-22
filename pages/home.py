@@ -3,55 +3,101 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Comms Tools", layout="wide", page_icon="📬")
 
-# Remove Streamlit's default top padding
-st.markdown("""
-<style>
-  .block-container { padding-top: 1rem !important; padding-bottom: 0 !important; }
-  header { display: none !important; }
-</style>
-""", unsafe_allow_html=True)
-
 components.html("""
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
 <head>
 <link rel="stylesheet" href="https://unpkg.com/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <style>
+  /* ── Theme tokens ── */
+  [data-theme="dark"] {
+    --bg:           #0e0e0e;
+    --surface:      #1a1a1a;
+    --surface-deep: #111;
+    --border:       #2d2d2d;
+    --border-hover: #444;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted:   #4b5563;
+    --tag-bg:       #242424;
+    --tag-text:     #6b7280;
+    --section-label: #9ca3af;
+    --copy-bg:      #1e1e1e;
+    --toggle-bg:    #2a2a2a;
+    --toggle-border:#3a3a3a;
+    --toggle-text:  #9ca3af;
+  }
+  [data-theme="light"] {
+    --bg:           #f5f5f5;
+    --surface:      #ffffff;
+    --surface-deep: #f9fafb;
+    --border:       #e5e7eb;
+    --border-hover: #9ca3af;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-muted:   #9ca3af;
+    --tag-bg:       #f3f4f6;
+    --tag-text:     #6b7280;
+    --section-label: #374151;
+    --copy-bg:      #f3f4f6;
+    --toggle-bg:    #e5e7eb;
+    --toggle-border:#d1d5db;
+    --toggle-text:  #374151;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-  html, body { height: 100%; background: transparent; }
-  body { padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  html, body { background: var(--bg); transition: background 0.2s; }
+  body { padding: 16px 4px 24px; display: flex; flex-direction: column; gap: 20px; }
 
-  /* Hero */
-  .hero { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-  .hero-label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #6b7280; }
-  .hero-title  { font-size: 18px; font-weight: 600; color: #f9fafb; }
-  .hero-sub    { font-size: 12px; color: #6b7280; }
+  /* ── Top bar ── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .hero-meta { display: flex; flex-direction: column; gap: 2px; }
+  .hero-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+  .hero-title { font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
+  .hero-sub   { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
-  /* Section row */
-  .section-row { display: flex; flex-direction: column; gap: 6px; }
-  .section-header { display: flex; align-items: center; gap: 6px; }
-  .section-label  { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4b5563; }
-  .section-icon   { font-size: 12px; }
+  /* ── Theme toggle ── */
+  .toggle-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 12px; border-radius: 8px;
+    background: var(--toggle-bg); border: 1px solid var(--toggle-border);
+    color: var(--toggle-text); font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    outline: none;
+  }
+  .toggle-btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
+  .toggle-btn i { font-size: 14px; }
+
+  /* ── Section ── */
+  .section { display: flex; flex-direction: column; gap: 10px; }
+  .section-header { display: flex; align-items: center; gap: 8px; padding-bottom: 2px; border-bottom: 1px solid var(--border); }
+  .section-icon { font-size: 15px; }
   .section-icon.comms  { color: #6b7280; }
   .section-icon.help   { color: #7c3aed; }
   .section-icon.ticket { color: #0284c7; }
-
-  /* Grids */
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-
-  /* Nav tile */
-  .tile {
-    background: #1a1a1a; border: 1px solid #2d2d2d; border-radius: 12px;
-    padding: 14px; display: flex; flex-direction: column; gap: 8px;
-    text-decoration: none; transition: border-color 0.15s, background 0.15s;
+  .section-label {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--section-label);
   }
-  .tile:hover { border-color: #555; background: #202020; }
+
+  /* ── Grid ── */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid-1 { display: grid; grid-template-columns: 1fr; gap: 12px; }
+
+  /* ── Nav tile ── */
+  .tile {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px; display: flex; flex-direction: column; gap: 10px;
+    text-decoration: none; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .tile:hover { border-color: var(--border-hover); box-shadow: 0 2px 10px rgba(0,0,0,0.12); }
 
   .tile-top { display: flex; align-items: flex-start; justify-content: space-between; }
   .tile-icon {
-    width: 32px; height: 32px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0;
   }
   .tile-icon.map     { background: #0d3326; color: #34d399; }
   .tile-icon.builder { background: #0c2240; color: #60a5fa; }
@@ -59,70 +105,77 @@ components.html("""
   .tile-icon.help    { background: #1c1040; color: #a78bfa; }
   .tile-icon.ticket  { background: #001e2d; color: #38bdf8; }
 
-  .arrow { color: #374151; font-size: 14px; }
-  .tile-title { font-size: 13px; font-weight: 600; color: #f3f4f6; }
-  .tile-desc  { font-size: 11px; color: #6b7280; line-height: 1.5; }
-  .tile-tags  { display: flex; gap: 4px; flex-wrap: wrap; margin-top: auto; }
-  .tag { font-size: 10px; padding: 2px 7px; border-radius: 100px; background: #242424; color: #6b7280; border: 1px solid #2d2d2d; }
+  .arrow { color: var(--text-muted); font-size: 15px; }
+  .tile-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+  .tile-desc  { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+  .tile-tags  { display: flex; gap: 5px; flex-wrap: wrap; margin-top: auto; }
+  .tag { font-size: 10px; padding: 2px 8px; border-radius: 100px; background: var(--tag-bg); color: var(--tag-text); border: 1px solid var(--border); }
 
-  /* Launcher tile */
+  /* ── Launcher tile ── */
   .launcher {
-    background: #1a1a1a; border: 1px solid #2d2d2d; border-radius: 12px;
-    padding: 14px; display: flex; flex-direction: column; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px; display: flex; flex-direction: column; gap: 10px;
   }
-  .launcher-title { font-size: 13px; font-weight: 600; color: #f3f4f6; }
-  .launcher-desc  { font-size: 11px; color: #6b7280; line-height: 1.5; }
+  .launcher-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .launcher-desc  { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
 
-  .link-list { display: flex; flex-direction: column; gap: 5px; margin-top: auto; }
+  /* ── Link items ── */
+  .link-list { display: flex; flex-direction: column; gap: 6px; }
 
   .link-item {
     display: flex; align-items: center; justify-content: space-between;
-    background: #111; border: 1px solid #262626; border-radius: 7px;
-    padding: 7px 10px; text-decoration: none;
-    transition: border-color 0.15s, background 0.15s; gap: 8px;
+    background: var(--surface-deep); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 12px; text-decoration: none;
+    transition: border-color 0.15s; gap: 8px;
   }
-  .link-item:hover { border-color: #3a3a3a; background: #161616; }
+  .link-item:hover { border-color: var(--border-hover); }
+  .link-item-left { display: flex; align-items: center; gap: 8px; }
 
   .link-item-row {
     display: flex; align-items: center;
-    background: #111; border: 1px solid #262626; border-radius: 7px;
-    padding: 7px 10px; gap: 8px;
-    transition: border-color 0.15s, background 0.15s;
+    background: var(--surface-deep); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 12px; gap: 8px; transition: border-color 0.15s;
   }
-  .link-item-row:hover { border-color: #3a3a3a; background: #161616; }
+  .link-item-row:hover { border-color: var(--border-hover); }
   .link-anchor { display: flex; align-items: center; gap: 8px; text-decoration: none; flex: 1; min-width: 0; }
 
-  .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
   .dot-mail   { background: #f59e0b; }
   .dot-help   { background: #a78bfa; }
   .dot-ticket { background: #38bdf8; }
 
-  .link-name { font-size: 12px; color: #d1d5db; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .link-ext  { color: #374151; font-size: 12px; flex-shrink: 0; }
+  .link-name { font-size: 13px; color: var(--text-primary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .link-ext  { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
 
-  .link-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .link-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
   .copy-btn {
     display: flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px; border-radius: 5px;
-    background: #1e1e1e; border: 1px solid #333;
-    color: #4b5563; cursor: pointer; font-size: 11px;
+    width: 24px; height: 24px; border-radius: 6px;
+    background: var(--copy-bg); border: 1px solid var(--border);
+    color: var(--text-muted); cursor: pointer; font-size: 12px;
     transition: all 0.15s; outline: none; flex-shrink: 0;
   }
-  .copy-btn:hover { background: #2a2a2a; color: #d1d5db; border-color: #444; }
+  .copy-btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
   .copy-btn.copied { background: #0d3326; color: #34d399; border-color: #1a5c40; }
 </style>
 </head>
 <body>
 
-  <!-- Hero -->
-  <div class="hero">
-    <span class="hero-label">noon seller comms</span>
-    <span class="hero-title">Comms Tools</span>
-    <span class="hero-sub">Internal tools for communication workflows at noon.</span>
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="hero-meta">
+      <span class="hero-label">noon seller comms</span>
+      <span class="hero-title">Comms Tools</span>
+      <span class="hero-sub">Internal tools for communication workflows at noon.</span>
+    </div>
+    <button class="toggle-btn" onclick="toggleTheme()" id="theme-btn">
+      <i class="ti ti-moon" id="theme-icon"></i>
+      <span id="theme-label">Light mode</span>
+    </button>
   </div>
 
   <!-- Comms Tools -->
-  <div class="section-row">
+  <div class="section">
     <div class="section-header">
       <i class="ti ti-tools section-icon comms"></i>
       <span class="section-label">Comms Tools</span>
@@ -136,7 +189,7 @@ components.html("""
         </div>
         <div>
           <p class="tile-title">Email Map</p>
-          <p class="tile-desc">Visualise and navigate email communication structure across teams.</p>
+          <p class="tile-desc">Visualise and navigate your full email communication structure across teams.</p>
         </div>
         <div class="tile-tags">
           <span class="tag">Templates</span><span class="tag">Journeys</span><span class="tag">Filters</span>
@@ -150,7 +203,7 @@ components.html("""
         </div>
         <div>
           <p class="tile-title">Email Builder</p>
-          <p class="tile-desc">Build and customise email templates for DSE seller outreach.</p>
+          <p class="tile-desc">Build and customise email templates for DSE seller communications and outreach.</p>
         </div>
         <div class="tile-tags">
           <span class="tag">DSE</span><span class="tag">Onboarding</span><span class="tag">Outreach</span>
@@ -167,15 +220,11 @@ components.html("""
         </div>
         <div class="link-list">
           <a class="link-item" href="https://notification-cms.noon.team/partner/email/template/" target="_blank">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div class="dot dot-mail"></div><span class="link-name">Notification CMS</span>
-            </div>
+            <div class="link-item-left"><div class="dot dot-mail"></div><span class="link-name">Notification CMS</span></div>
             <i class="ti ti-external-link link-ext"></i>
           </a>
           <a class="link-item" href="https://crm.noon.team/campaign?tenant=partner" target="_blank">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div class="dot dot-mail"></div><span class="link-name">Cerebro (noon CRM)</span>
-            </div>
+            <div class="link-item-left"><div class="dot dot-mail"></div><span class="link-name">Cerebro (noon CRM)</span></div>
             <i class="ti ti-external-link link-ext"></i>
           </a>
         </div>
@@ -184,14 +233,13 @@ components.html("""
     </div>
   </div>
 
-  <!-- Help Center + Ticket Handling side by side -->
-  <div class="grid-2">
-
-    <div class="section-row">
-      <div class="section-header">
-        <i class="ti ti-lifebuoy section-icon help"></i>
-        <span class="section-label">Help Center</span>
-      </div>
+  <!-- Help Center -->
+  <div class="section">
+    <div class="section-header">
+      <i class="ti ti-lifebuoy section-icon help"></i>
+      <span class="section-label">Help Center</span>
+    </div>
+    <div class="grid-1">
       <div class="launcher">
         <div class="tile-top">
           <div class="tile-icon help"><i class="ti ti-headset"></i></div>
@@ -202,9 +250,7 @@ components.html("""
         </div>
         <div class="link-list">
           <a class="link-item" href="https://helpcenter.noon.partners/" target="_blank">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div class="dot dot-help"></div><span class="link-name">Admin Panel</span>
-            </div>
+            <div class="link-item-left"><div class="dot dot-help"></div><span class="link-name">Admin Panel</span></div>
             <i class="ti ti-external-link link-ext"></i>
           </a>
           <div class="link-item-row">
@@ -212,23 +258,22 @@ components.html("""
               <div class="dot dot-help"></div><span class="link-name">Help Center Portal</span>
             </a>
             <div class="link-actions">
-              <button class="copy-btn" onclick="copyLink(this,'https://helpcenter.noon.team/')" title="Copy link">
-                <i class="ti ti-copy"></i>
-              </button>
-              <a href="https://helpcenter.noon.team/" target="_blank" style="display:flex;align-items:center;">
-                <i class="ti ti-external-link link-ext"></i>
-              </a>
+              <button class="copy-btn" onclick="copyLink(this,'https://helpcenter.noon.team/')" title="Copy link"><i class="ti ti-copy"></i></button>
+              <a href="https://helpcenter.noon.team/" target="_blank" style="display:flex;align-items:center;"><i class="ti ti-external-link link-ext"></i></a>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="section-row">
-      <div class="section-header">
-        <i class="ti ti-ticket section-icon ticket"></i>
-        <span class="section-label">Ticket Handling</span>
-      </div>
+  <!-- Ticket Handling -->
+  <div class="section">
+    <div class="section-header">
+      <i class="ti ti-ticket section-icon ticket"></i>
+      <span class="section-label">Ticket Handling</span>
+    </div>
+    <div class="grid-1">
       <div class="launcher">
         <div class="tile-top">
           <div class="tile-icon ticket"><i class="ti ti-brand-jira"></i></div>
@@ -239,9 +284,7 @@ components.html("""
         </div>
         <div class="link-list">
           <a class="link-item" href="https://next-square.atlassian.net/jira/servicedesk/projects/SC/queues/custom/962" target="_blank">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div class="dot dot-ticket"></div><span class="link-name">Tickets Admin Panel</span>
-            </div>
+            <div class="link-item-left"><div class="dot dot-ticket"></div><span class="link-name">Tickets Admin Panel</span></div>
             <i class="ti ti-external-link link-ext"></i>
           </a>
           <div class="link-item-row">
@@ -249,21 +292,24 @@ components.html("""
               <div class="dot dot-ticket"></div><span class="link-name">New JIRA Ticket</span>
             </a>
             <div class="link-actions">
-              <button class="copy-btn" onclick="copyLink(this,'https://next-square.atlassian.net/servicedesk/customer/portal/89')" title="Copy link">
-                <i class="ti ti-copy"></i>
-              </button>
-              <a href="https://next-square.atlassian.net/servicedesk/customer/portal/89" target="_blank" style="display:flex;align-items:center;">
-                <i class="ti ti-external-link link-ext"></i>
-              </a>
+              <button class="copy-btn" onclick="copyLink(this,'https://next-square.atlassian.net/servicedesk/customer/portal/89')" title="Copy link"><i class="ti ti-copy"></i></button>
+              <a href="https://next-square.atlassian.net/servicedesk/customer/portal/89" target="_blank" style="display:flex;align-items:center;"><i class="ti ti-external-link link-ext"></i></a>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 
 <script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    document.getElementById('theme-icon').className = isDark ? 'ti ti-moon' : 'ti ti-sun';
+    document.getElementById('theme-label').textContent = isDark ? 'Light mode' : 'Dark mode';
+  }
+
   function copyLink(btn, url) {
     navigator.clipboard.writeText(url).then(function() {
       btn.classList.add('copied');
@@ -277,4 +323,4 @@ components.html("""
 </script>
 </body>
 </html>
-""", height=720, scrolling=False)
+""", height=720, scrolling=True)
