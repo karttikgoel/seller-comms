@@ -7,7 +7,7 @@ st.set_page_config(page_title="Comms Tools", layout="wide", page_icon="📬")
 if "theme" not in st.session_state:
     st.session_state.theme = "dark"
 
-# Tighten Streamlit chrome and kill bottom dead space
+# Kill Streamlit footer and tighten container
 st.markdown("""
 <style>
   .block-container {
@@ -15,24 +15,26 @@ st.markdown("""
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
     padding-bottom: 0 !important;
+    max-width: 100% !important;
   }
   footer { display: none !important; }
-  .stIFrame { margin-bottom: 0 !important; display: block; }
-  /* Style the native Streamlit toggle button to match the page */
-  div[data-testid="stHorizontalBlock"] { align-items: center; }
+  [data-testid="stBottom"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
-# Native Streamlit top bar: title left, toggle right
-col_title, col_toggle = st.columns([8, 1])
+# ── Streamlit native top bar ──────────────────────────────
+col_title, col_toggle = st.columns([9, 1])
 with col_title:
     st.markdown("""
-      <div style="line-height:1">
-        <span style="font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#6b7280;">noon seller comms</span><br>
-        <span style="font-size:22px;font-weight:700;color:inherit;">Comms Tools</span><br>
-        <span style="font-size:12px;color:#9ca3af;">Internal tools for communication workflows at noon.</span>
+      <div style="line-height:1.3; margin-bottom: 4px;">
+        <span style="font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:#6b7280;">
+          noon seller comms
+        </span><br>
+        <span style="font-size:22px; font-weight:700;">Comms Tools</span><br>
+        <span style="font-size:12px; color:#9ca3af;">Internal tools for communication workflows at noon.</span>
       </div>
     """, unsafe_allow_html=True)
+
 with col_toggle:
     label = "☀️ Light" if st.session_state.theme == "dark" else "🌙 Dark"
     if st.button(label, use_container_width=True):
@@ -41,6 +43,7 @@ with col_toggle:
 
 theme = st.session_state.theme
 
+# ── iframe: only sections, no hero ───────────────────────
 components.html(f"""
 <!DOCTYPE html>
 <html data-theme="{theme}">
@@ -73,14 +76,9 @@ components.html(f"""
   }}
 
   * {{ box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }}
-  html {{ background: var(--bg); }}
-  body {{
-    background: var(--bg);
-    padding: 8px 20px 20px;
-    display: flex; flex-direction: column; gap: 18px;
-  }}
+  html, body {{ background: var(--bg); }}
+  body {{ padding: 4px 20px 24px; display: flex; flex-direction: column; gap: 18px; }}
 
-  /* Section */
   .section {{ display: flex; flex-direction: column; gap: 10px; }}
   .section-header {{
     display: flex; align-items: center; gap: 8px;
@@ -98,7 +96,6 @@ components.html(f"""
 
   .grid-3 {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }}
 
-  /* Nav tile */
   .tile {{
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 16px; display: flex; flex-direction: column; gap: 10px;
@@ -119,14 +116,12 @@ components.html(f"""
   .tile-title {{ font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }}
   .tile-desc  {{ font-size: 12px; color: var(--text-secondary); line-height: 1.55; }}
 
-  /* Launcher tile */
   .launcher {{
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 16px; display: flex; flex-direction: column; gap: 10px;
   }}
   .launcher-desc {{ font-size: 12px; color: var(--text-secondary); line-height: 1.55; }}
 
-  /* Link items */
   .link-list {{ display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }}
   .link-item {{
     display: flex; align-items: center; justify-content: space-between;
@@ -264,14 +259,6 @@ components.html(f"""
   </div>
 
 <script>
-  // Auto-resize iframe to content height to eliminate blank space
-  function resize() {{
-    const h = document.body.scrollHeight;
-    window.parent.postMessage({{type: 'streamlit:setFrameHeight', height: h}}, '*');
-  }}
-  window.addEventListener('load', resize);
-  new ResizeObserver(resize).observe(document.body);
-
   function copyLink(btn, url) {{
     navigator.clipboard.writeText(url).then(function() {{
       btn.classList.add('copied');
@@ -282,4 +269,4 @@ components.html(f"""
 </script>
 </body>
 </html>
-""", height=1000, scrolling=True)
+""", height=720, scrolling=True)
