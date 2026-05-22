@@ -3,10 +3,6 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Comms Tools", layout="wide", page_icon="📬")
 
-# Theme state
-if "theme" not in st.session_state:
-    st.session_state.theme = "dark"
-
 # Kill Streamlit footer and tighten container
 st.markdown("""
 <style>
@@ -23,34 +19,24 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── Streamlit native top bar ──────────────────────────────
-col_title, col_toggle = st.columns([9, 1])
-with col_title:
-    st.markdown("""
-      <div style="line-height:1.3; margin-bottom: 4px;">
-        <span style="font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:#6b7280;">
-          noon seller comms
-        </span><br>
-        <span style="font-size:22px; font-weight:700;">Comms Tools</span><br>
-        <span style="font-size:12px; color:#9ca3af;">Internal tools for communication workflows at noon.</span>
-      </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+  <div style="line-height:1.3; margin-bottom: 8px;">
+    <span style="font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:#6b7280;">
+      noon seller comms
+    </span><br>
+    <span style="font-size:22px; font-weight:700;">Comms Tools</span><br>
+    <span style="font-size:12px; color:#9ca3af;">Internal tools for communication workflows at noon.</span>
+  </div>
+""", unsafe_allow_html=True)
 
-with col_toggle:
-    label = "☀️ Light" if st.session_state.theme == "dark" else "🌙 Dark"
-    if st.button(label, use_container_width=True):
-        st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
-        st.rerun()
-
-theme = st.session_state.theme
-
-# ── iframe: only sections, no hero ───────────────────────
-components.html(f"""
+# ── iframe: theme auto-detected from Streamlit parent ────
+components.html("""
 <!DOCTYPE html>
-<html data-theme="{theme}">
+<html data-theme="dark">
 <head>
 <link rel="stylesheet" href="https://unpkg.com/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <style>
-  [data-theme="dark"] {{
+  [data-theme="dark"] {
     --bg:             #0e0e0e;
     --surface:        #1a1a1a;
     --surface-deep:   #111;
@@ -61,8 +47,8 @@ components.html(f"""
     --text-muted:     #4b5563;
     --section-label:  #c9d1db;
     --copy-bg:        #1e1e1e;
-  }}
-  [data-theme="light"] {{
+  }
+  [data-theme="light"] {
     --bg:             #f5f5f5;
     --surface:        #ffffff;
     --surface-deep:   #f9fafb;
@@ -73,86 +59,86 @@ components.html(f"""
     --text-muted:     #9ca3af;
     --section-label:  #1f2937;
     --copy-bg:        #f3f4f6;
-  }}
+  }
 
-  * {{ box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }}
-  html, body {{ background: var(--bg); }}
-  body {{ padding: 4px 20px 24px; display: flex; flex-direction: column; gap: 18px; }}
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  html, body { background: var(--bg); }
+  body { padding: 4px 20px 24px; display: flex; flex-direction: column; gap: 18px; }
 
-  .section {{ display: flex; flex-direction: column; gap: 10px; }}
-  .section-header {{
+  .section { display: flex; flex-direction: column; gap: 10px; }
+  .section-header {
     display: flex; align-items: center; gap: 8px;
     padding-bottom: 6px; border-bottom: 1px solid var(--border);
-  }}
-  .section-icon {{ font-size: 15px; }}
-  .section-icon.comms  {{ color: #6b7280; }}
-  .section-icon.help   {{ color: #7c3aed; }}
-  .section-icon.ticket {{ color: #0284c7; }}
-  .section-label {{
+  }
+  .section-icon { font-size: 15px; }
+  .section-icon.comms  { color: #6b7280; }
+  .section-icon.help   { color: #7c3aed; }
+  .section-icon.ticket { color: #0284c7; }
+  .section-label {
     font-size: 13px; font-weight: 700;
     letter-spacing: 0.06em; text-transform: uppercase;
     color: var(--section-label);
-  }}
+  }
 
-  .grid-3 {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }}
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
-  .tile {{
+  .tile {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 16px; display: flex; flex-direction: column; gap: 10px;
     text-decoration: none; transition: border-color 0.15s, box-shadow 0.15s;
-  }}
-  .tile:hover {{ border-color: var(--border-hover); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-  .tile-top {{ display: flex; align-items: flex-start; justify-content: space-between; }}
-  .tile-icon {{
+  }
+  .tile:hover { border-color: var(--border-hover); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+  .tile-top { display: flex; align-items: flex-start; justify-content: space-between; }
+  .tile-icon {
     width: 36px; height: 36px; border-radius: 9px;
     display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0;
-  }}
-  .tile-icon.map     {{ background: #0d3326; color: #34d399; }}
-  .tile-icon.builder {{ background: #0c2240; color: #60a5fa; }}
-  .tile-icon.mail    {{ background: #2d1a00; color: #f59e0b; }}
-  .tile-icon.help    {{ background: #1c1040; color: #a78bfa; }}
-  .tile-icon.ticket  {{ background: #001e2d; color: #38bdf8; }}
-  .arrow      {{ color: var(--text-muted); font-size: 15px; }}
-  .tile-title {{ font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }}
-  .tile-desc  {{ font-size: 12px; color: var(--text-secondary); line-height: 1.55; }}
+  }
+  .tile-icon.map     { background: #0d3326; color: #34d399; }
+  .tile-icon.builder { background: #0c2240; color: #60a5fa; }
+  .tile-icon.mail    { background: #2d1a00; color: #f59e0b; }
+  .tile-icon.help    { background: #1c1040; color: #a78bfa; }
+  .tile-icon.ticket  { background: #001e2d; color: #38bdf8; }
+  .arrow      { color: var(--text-muted); font-size: 15px; }
+  .tile-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+  .tile-desc  { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
 
-  .launcher {{
+  .launcher {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 16px; display: flex; flex-direction: column; gap: 10px;
-  }}
-  .launcher-desc {{ font-size: 12px; color: var(--text-secondary); line-height: 1.55; }}
+  }
+  .launcher-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
 
-  .link-list {{ display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }}
-  .link-item {{
+  .link-list { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
+  .link-item {
     display: flex; align-items: center; justify-content: space-between;
     background: var(--surface-deep); border: 1px solid var(--border); border-radius: 8px;
     padding: 9px 12px; text-decoration: none; transition: border-color 0.15s; gap: 8px;
-  }}
-  .link-item:hover {{ border-color: var(--border-hover); }}
-  .link-item-left {{ display: flex; align-items: center; gap: 8px; }}
-  .link-item-row {{
+  }
+  .link-item:hover { border-color: var(--border-hover); }
+  .link-item-left { display: flex; align-items: center; gap: 8px; }
+  .link-item-row {
     display: flex; align-items: center;
     background: var(--surface-deep); border: 1px solid var(--border); border-radius: 8px;
     padding: 9px 12px; gap: 8px; transition: border-color 0.15s;
-  }}
-  .link-item-row:hover {{ border-color: var(--border-hover); }}
-  .link-anchor {{ display: flex; align-items: center; gap: 8px; text-decoration: none; flex: 1; min-width: 0; }}
-  .dot        {{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }}
-  .dot-mail   {{ background: #f59e0b; }}
-  .dot-help   {{ background: #a78bfa; }}
-  .dot-ticket {{ background: #38bdf8; }}
-  .link-name  {{ font-size: 13px; color: var(--text-primary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
-  .link-ext   {{ color: var(--text-muted); font-size: 13px; flex-shrink: 0; }}
-  .link-actions {{ display: flex; align-items: center; gap: 5px; flex-shrink: 0; }}
-  .copy-btn {{
+  }
+  .link-item-row:hover { border-color: var(--border-hover); }
+  .link-anchor { display: flex; align-items: center; gap: 8px; text-decoration: none; flex: 1; min-width: 0; }
+  .dot        { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-mail   { background: #f59e0b; }
+  .dot-help   { background: #a78bfa; }
+  .dot-ticket { background: #38bdf8; }
+  .link-name  { font-size: 13px; color: var(--text-primary); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .link-ext   { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
+  .link-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+  .copy-btn {
     display: flex; align-items: center; justify-content: center;
     width: 24px; height: 24px; border-radius: 6px;
     background: var(--copy-bg); border: 1px solid var(--border);
     color: var(--text-muted); cursor: pointer; font-size: 12px;
     transition: all 0.15s; outline: none; flex-shrink: 0;
-  }}
-  .copy-btn:hover {{ border-color: var(--border-hover); color: var(--text-primary); }}
-  .copy-btn.copied {{ background: #0d3326; color: #34d399; border-color: #1a5c40; }}
+  }
+  .copy-btn:hover { border-color: var(--border-hover); color: var(--text-primary); }
+  .copy-btn.copied { background: #0d3326; color: #34d399; border-color: #1a5c40; }
 </style>
 </head>
 <body>
@@ -259,22 +245,43 @@ components.html(f"""
   </div>
 
 <script>
-  // Auto-size iframe to content height + 20px bottom padding
-  function syncHeight() {{
-    const h = document.body.scrollHeight + 20;
-    window.parent.postMessage({{type: 'streamlit:setFrameHeight', height: h}}, '*');
-  }}
-  // Fire on load and whenever content resizes
+  // ── Dynamic height ──────────────────────────────────────
+  // isStreamlitMessage:true is required for Streamlit to act on this
+  function syncHeight() {
+    window.parent.postMessage({
+      isStreamlitMessage: true,
+      type: 'streamlit:setFrameHeight',
+      height: document.body.scrollHeight + 20
+    }, '*');
+  }
   window.addEventListener('load', syncHeight);
   new ResizeObserver(syncHeight).observe(document.body);
 
-  function copyLink(btn, url) {{
-    navigator.clipboard.writeText(url).then(function() {{
+  // ── Theme sync from Streamlit parent (same-origin) ──────
+  function applyParentTheme() {
+    try {
+      const bg = getComputedStyle(window.parent.document.body).backgroundColor;
+      const rgb = bg.match(/\d+/g);
+      if (rgb) {
+        const luminance = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+        document.documentElement.setAttribute('data-theme', luminance < 128 ? 'dark' : 'light');
+      }
+    } catch(e) {}
+  }
+  applyParentTheme();
+  // Re-check when Streamlit re-renders and changes body styles
+  new MutationObserver(applyParentTheme).observe(
+    window.parent.document.body,
+    { attributes: true, attributeFilter: ['class', 'style'], subtree: false }
+  );
+
+  function copyLink(btn, url) {
+    navigator.clipboard.writeText(url).then(function() {
       btn.classList.add('copied');
       btn.innerHTML = '<i class="ti ti-check"></i>';
-      setTimeout(function() {{ btn.classList.remove('copied'); btn.innerHTML = '<i class="ti ti-copy"></i>'; }}, 2000);
-    }});
-  }}
+      setTimeout(function() { btn.classList.remove('copied'); btn.innerHTML = '<i class="ti ti-copy"></i>'; }, 2000);
+    });
+  }
 </script>
 </body>
 </html>
